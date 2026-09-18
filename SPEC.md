@@ -21,7 +21,7 @@ Español rioplatense, en primera persona cuando hace falta. Frases cortas y veri
 
 1. Portada — foto, nombre, año / odómetro / registros / precio.
 2. Fotos — vista giratoria de 7 cuadros + grilla de 15 fotos.
-3. Ficha — perfil monocromo con 5 llamadas + lista de datos.
+3. Especificaciones — perfil monocromo con 5 llamadas, lista de datos y equipamiento destacado.
 4. Historial — gráfico de km con popup de comprobante; tabla completa debajo.
 5. Detalles — 5 primeros planos de imperfecciones, sin repetir la misma zona.
 6. Cochera — el auto guardado bajo techo.
@@ -36,7 +36,8 @@ Español rioplatense, en primera persona cuando hace falta. Frases cortas y veri
 - **Las anomalías se dejan a la vista.** El registro del 8 de mayo de 2013 anota menos kilómetros que el anterior. Se muestra como fue anotado, con la aclaración.
 - **Los defectos no se esconden.** La sección Detalles es parte del argumento, no una concesión.
 - **El respaldo es papel o es foto.** Un comprobante lleva resaltada la fecha y el kilometraje; una foto del trabajo lleva epígrafe y nada más. No se presenta una foto como si fuera un comprobante.
-- **Los datos personales no se publican.** De los comprobantes se difumina DNI, teléfono y correo, y la patente de cualquier auto ajeno.
+- **Los datos personales no se publican.** De los comprobantes se difumina DNI, teléfono y correo, la patente de cualquier auto ajeno y la cara de cualquier persona. El incidente se cuenta con la foto de la cámara, pero sin identificar a nadie.
+- **Cada marca tiene su explicación.** Un detalle con historia detrás lleva un (i) que abre las fotos de contexto. Se explica de dónde salió, no se disimula.
 
 ## Accesibilidad
 

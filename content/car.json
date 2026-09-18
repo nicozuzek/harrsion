@@ -1,872 +1,944 @@
 {
- "vehiculo": {
-  "nombre": "Harrison",
-  "modelo": "Ford Fiesta Kinetic Design Titanium",
-  "anio": 2012,
-  "puertas": 5,
-  "motor": "1.6 TiVCT nafta",
-  "caja": "Manual, 5 velocidades",
-  "odometro": 92116,
-  "odometroFecha": "2026-09-13",
-  "cubiertas": "195/50 R16",
-  "precioUsd": 9500,
-  "contacto": "nicozuzek@gmail.com",
-  "compraKm": 54000
- },
- "fotos": [
-  {
-   "file": "01-tres-cuartos-delantero-izquierdo.jpg",
-   "label": "Tres cuartos delantero, al atardecer",
-   "shot": "tres-cuartos-delantero",
-   "w": 2200,
-   "h": 1650
+  "vehiculo": {
+    "nombre": "Harrison",
+    "modelo": "Ford Fiesta Kinetic Design Titanium",
+    "anio": 2012,
+    "puertas": 5,
+    "motor": "1.6 TiVCT nafta",
+    "caja": "Manual, 5 velocidades",
+    "odometro": 92116,
+    "odometroFecha": "2026-09-13",
+    "cubiertas": "195/50 R16",
+    "precioUsd": 9500,
+    "contacto": "nicozuzek@gmail.com",
+    "compraKm": 54000
   },
-  {
-   "file": "02-tres-cuartos-delantero-izquierdo.jpg",
-   "label": "Tres cuartos delantero izquierdo",
-   "shot": "tres-cuartos-delantero",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "03-lateral-izquierdo-al-atardecer.jpg",
-   "label": "Lateral izquierdo al atardecer",
-   "shot": "lateral-izquierdo",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "04-lateral-izquierdo-completo.jpg",
-   "label": "Lateral izquierdo completo",
-   "shot": "lateral-izquierdo",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "07-tres-cuartos-trasero-izquierdo.jpg",
-   "label": "Tres cuartos trasero izquierdo",
-   "shot": "tres-cuartos-trasero",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "09-trasera-y-paragolpes.jpg",
-   "label": "Trasera y paragolpes",
-   "shot": "trasera",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "10-frente-completo.jpg",
-   "label": "Frente completo",
-   "shot": "frente",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "11-rueda-delantera-izquierda.jpg",
-   "label": "Rueda delantera izquierda",
-   "shot": "rueda",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "12-rueda-trasera-derecha.jpg",
-   "label": "Rueda trasera derecha",
-   "shot": "rueda",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "13-asientos-traseros.jpg",
-   "label": "Asientos traseros",
-   "shot": "interior-trasero",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "14-consola-central-y-palanca.jpg",
-   "label": "Consola central y palanca",
-   "shot": "interior-delantero",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "15-puesto-de-conduccion.jpg",
-   "label": "Puesto de conduccion",
-   "shot": "interior-delantero",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "16-volante-y-tablero.jpg",
-   "label": "Volante y tablero",
-   "shot": "tablero",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "17-odometro-con-kilometraje.jpg",
-   "label": "Odometro con kilometraje",
-   "shot": "odometro",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "18-baul-abierto.jpg",
-   "label": "Baul abierto",
-   "shot": "baul",
-   "w": 2200,
-   "h": 1650
-  }
- ],
- "detalles": [
-  {
-   "file": "02-rayones-junto-a-faro-antiniebla.jpg",
-   "label": "Rayones junto a faro antiniebla",
-   "nota": "Rayones y saltaduras de pintura en la esquina delantera izquierda.",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "03-marcas-bajo-manija-puerta-trasera.jpg",
-   "label": "Marcas bajo manija puerta trasera",
-   "nota": "Rayón horizontal bajo la manija de la puerta trasera derecha.",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "04-rayones-en-paragolpes-trasero.jpg",
-   "label": "Rayones en paragolpes trasero",
-   "nota": "Marcas y raspones en el paragolpes trasero derecho.",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "06-rayones-en-frente-derecho.jpg",
-   "label": "Rayones en el frente",
-   "nota": "Rayones y marcas sobre el paragolpes delantero y la parrilla.",
-   "w": 2200,
-   "h": 1650
-  },
-  {
-   "file": "07-perilla-de-cambios-desgastada.jpg",
-   "label": "Perilla de cambios desgastada",
-   "nota": "Cuero de la perilla y funda con desgaste por uso.",
-   "w": 2200,
-   "h": 1650
-  }
- ],
- "services": [
-  {
-   "id": "2013-04-05-shell",
-   "date": "2013-04-05",
-   "workshop": "Shell",
-   "category": "Mantenimiento",
-   "notes": "Cambio de filtro de aceite.",
-   "mileage": 6073,
-   "scans": [
+  "fotos": [
     {
-     "src": "/car/comprobantes/2013-04-05-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.3,
-       "y": 0.12,
-       "w": 0.212,
-       "h": 0.042
-      },
-      {
-       "kind": "km",
-       "x": 0.613,
-       "y": 0.12,
-       "w": 0.158,
-       "h": 0.042
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2013-05-08-armoraut-dietrich",
-   "date": "2013-05-08",
-   "workshop": "Armoraut Dietrich",
-   "category": "Service",
-   "notes": "Alineación y balanceo. Elemento del filtro de polen.",
-   "mileage": 6071,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2013-05-08-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.634,
-       "y": 0.151,
-       "w": 0.084,
-       "h": 0.017
-      },
-      {
-       "kind": "km",
-       "x": 0.405,
-       "y": 0.784,
-       "w": 0.097,
-       "h": 0.017
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ],
-   "mileageAnomaly": true
-  },
-  {
-   "id": "2015-01-01-armoraut-dietrich",
-   "date": "2015-01-01",
-   "workshop": "Armoraut Dietrich",
-   "category": "Service",
-   "notes": "Alineación y balanceo. Filtro de aceite de motor, aceite de motor, elemento del filtro de aire y elemento del filtro de polen.",
-   "mileage": 11405,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2015-01-01-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.602,
-       "y": 0.146,
-       "w": 0.084,
-       "h": 0.017
-      },
-      {
-       "kind": "km",
-       "x": 0.38,
-       "y": 0.76,
-       "w": 0.102,
-       "h": 0.017
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2017-08-23-armoraut-dietrich",
-   "date": "2017-08-23",
-   "workshop": "Armoraut Dietrich",
-   "category": "Service",
-   "notes": "Líquido limpiaparabrisas, aceite de motor, elemento del filtro de aire y filtro de aceite de motor.",
-   "mileage": 24871,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2017-08-23-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.622,
-       "y": 0.165,
-       "w": 0.086,
-       "h": 0.017
-      },
-      {
-       "kind": "km",
-       "x": 0.42,
-       "y": 0.784,
-       "w": 0.097,
-       "h": 0.017
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2019-01-25-armoraut-dietrich",
-   "date": "2019-01-25",
-   "workshop": "Armoraut Dietrich",
-   "category": "Service",
-   "notes": "Elemento del filtro de aire, aceite de motor Elaion F50E, filtro antipolen del habitáculo y filtro de aceite BE8Z/9731/AB.",
-   "mileage": 34003,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2019-01-25-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.551,
-       "y": 0.118,
-       "w": 0.117,
-       "h": 0.024
-      },
-      {
-       "kind": "km",
-       "x": 0.48,
-       "y": 0.333,
-       "w": 0.079,
-       "h": 0.025
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2019-06-26-baterias-warnes",
-   "date": "2019-06-26",
-   "workshop": "Baterías Warnes",
-   "category": "Batería",
-   "notes": "Cambio de batería.",
-   "scans": [
-    {
-     "src": "/car/comprobantes/2019-06-26-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.503,
-       "y": 0.224,
-       "w": 0.184,
-       "h": 0.04
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2022-07-15-armoraut-dietrich",
-   "date": "2022-07-15",
-   "workshop": "Armoraut Dietrich",
-   "category": "Service",
-   "notes": "Quinto service anual: bulbo, elemento del filtro de aire, aceite sintético FE 530 y filtro de aceite. Además, fusibles de 20 A y lámpara 12V5W.",
-   "mileage": 58896,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2022-07-15-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.548,
-       "y": 0.084,
-       "w": 0.129,
-       "h": 0.024
-      },
-      {
-       "kind": "km",
-       "x": 0.483,
-       "y": 0.321,
-       "w": 0.079,
-       "h": 0.025
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2023-02-15-autocenter",
-   "date": "2023-02-15",
-   "workshop": "Autocenter",
-   "category": "Registro",
-   "notes": "Visita registrada en la planilla, sin detalle de trabajos."
-  },
-  {
-   "id": "2023-02-15-quicklane",
-   "date": "2023-02-15",
-   "workshop": "QuickLane",
-   "category": "Arreglo",
-   "notes": "Intento de reparación de un problema eléctrico."
-  },
-  {
-   "id": "2023-04-06-robayna",
-   "date": "2023-04-06",
-   "workshop": "Robayna",
-   "category": "Arreglo",
-   "notes": "Diagnóstico con IDS: DTC P2279 (fuga en el sistema de aire de admisión) y P0607 (falla del módulo de control interno). Se renovó el o-ring del cuerpo de mariposa y se lo limpió, se actualizó el software del PCM y se reinició la memoria KAM. La medición con Midtronics indicó cambiar la batería: se colocó una de 60 Ah.",
-   "mileage": 65428,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2023-04-06-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.548,
-       "y": 0.079,
-       "w": 0.119,
-       "h": 0.023
-      },
-      {
-       "kind": "km",
-       "x": 0.485,
-       "y": 0.307,
-       "w": 0.08,
-       "h": 0.025
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2023-06-15-daytona",
-   "date": "2023-06-15",
-   "workshop": "Daytona",
-   "category": "Ruedas",
-   "notes": "Dos cubiertas Bridgestone Ecopia EP150 195/50 R16, alineación y balanceo.",
-   "scans": [
-    {
-     "src": "/car/comprobantes/2023-06-15-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.606,
-       "y": 0.131,
-       "w": 0.119,
-       "h": 0.022
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2023-10-12-armoraut-dietrich",
-   "date": "2023-10-12",
-   "workshop": "Armoraut Dietrich",
-   "category": "Service",
-   "notes": "Sexto service anual: aceite, elemento del filtro de aire, filtro antipolen, filtro de aceite, filtro de combustible y plumillas.",
-   "mileage": 70265,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2023-10-12-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.544,
-       "y": 0.086,
-       "w": 0.119,
-       "h": 0.023
-      },
-      {
-       "kind": "km",
-       "x": 0.48,
-       "y": 0.324,
-       "w": 0.079,
-       "h": 0.025
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2023-10-21-daytona",
-   "date": "2023-10-21",
-   "workshop": "Daytona",
-   "category": "Ruedas",
-   "notes": "Dos cubiertas y balanceo, pastillas de freno delanteras y amortiguadores traseros Monroe.",
-   "scans": [
-    {
-     "src": "/car/comprobantes/2023-10-21-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.834,
-       "y": 0.083,
-       "w": 0.084,
-       "h": 0.016
-      }
-     ],
-     "tipo": "comprobante"
+      "file": "01-tres-cuartos-delantero-izquierdo.jpg",
+      "label": "Tres cuartos delantero, al atardecer",
+      "shot": "tres-cuartos-delantero",
+      "w": 2200,
+      "h": 1650
     },
     {
-     "src": "/car/comprobantes/2023-10-21-2.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.59,
-       "y": 0.156,
-       "w": 0.119,
-       "h": 0.022
+      "file": "02-tres-cuartos-delantero-izquierdo.jpg",
+      "label": "Tres cuartos delantero izquierdo",
+      "shot": "tres-cuartos-delantero",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "03-lateral-izquierdo-al-atardecer.jpg",
+      "label": "Lateral izquierdo al atardecer",
+      "shot": "lateral-izquierdo",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "04-lateral-izquierdo-completo.jpg",
+      "label": "Lateral izquierdo completo",
+      "shot": "lateral-izquierdo",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "07-tres-cuartos-trasero-izquierdo.jpg",
+      "label": "Tres cuartos trasero izquierdo",
+      "shot": "tres-cuartos-trasero",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "09-trasera-y-paragolpes.jpg",
+      "label": "Trasera y paragolpes",
+      "shot": "trasera",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "10-frente-completo.jpg",
+      "label": "Frente completo",
+      "shot": "frente",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "11-rueda-delantera-izquierda.jpg",
+      "label": "Rueda delantera izquierda",
+      "shot": "rueda",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "12-rueda-trasera-derecha.jpg",
+      "label": "Rueda trasera derecha",
+      "shot": "rueda",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "13-asientos-traseros.jpg",
+      "label": "Asientos traseros",
+      "shot": "interior-trasero",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "14-consola-central-y-palanca.jpg",
+      "label": "Consola central y palanca",
+      "shot": "interior-delantero",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "15-puesto-de-conduccion.jpg",
+      "label": "Puesto de conduccion",
+      "shot": "interior-delantero",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "16-volante-y-tablero.jpg",
+      "label": "Volante y tablero",
+      "shot": "tablero",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "17-odometro-con-kilometraje.jpg",
+      "label": "Odometro con kilometraje",
+      "shot": "odometro",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "18-baul-abierto.jpg",
+      "label": "Baul abierto",
+      "shot": "baul",
+      "w": 2200,
+      "h": 1650
+    }
+  ],
+  "detalles": [
+    {
+      "file": "02-rayones-junto-a-faro-antiniebla.jpg",
+      "label": "Rayones junto a faro antiniebla",
+      "nota": "Rayones y saltaduras de pintura en la esquina delantera izquierda.",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "03-marcas-bajo-manija-puerta-trasera.jpg",
+      "label": "Marcas bajo manija puerta trasera",
+      "nota": "Rayón horizontal bajo la manija de la puerta trasera derecha.",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "04-rayones-en-paragolpes-trasero.jpg",
+      "label": "Rayones en paragolpes trasero",
+      "nota": "Marcas y raspones en el paragolpes trasero derecho.",
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "06-rayones-en-frente-derecho.jpg",
+      "label": "Rayones en el frente",
+      "nota": "Rayones y marcas sobre el paragolpes delantero y la parrilla.",
+      "w": 2200,
+      "h": 1650,
+      "historia": {
+        "carpeta": "incidente",
+        "titulo": "De dónde salieron estos rayones",
+        "texto": "El 1 de febrero de 2024 le pegaron al frente con el auto estacionado en una cochera. La cámara del lugar lo registró. El golpe arrancó la patente delantera y dejó las marcas del paragolpes. No hubo daño estructural: el paragolpes nunca se cambió, y así quedó.",
+        "fotos": [
+          {
+            "file": "01.jpg",
+            "label": "La cámara del estacionamiento, 1 de febrero de 2024",
+            "w": 1500,
+            "h": 1126
+          },
+          {
+            "file": "02.jpg",
+            "label": "La patente delantera en el piso, al día siguiente",
+            "w": 1500,
+            "h": 1998
+          }
+        ]
       }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2024-04-24-euroservice",
-   "date": "2024-04-24",
-   "workshop": "Euroservice",
-   "category": "Service",
-   "notes": "Kit de distribución completo: correa, poleas tensoras, poleas locas y bomba de agua. El comprobante del taller anota 75.116 km.",
-   "scans": [
+    },
     {
-     "src": "/car/comprobantes/2024-04-24-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.113,
-       "y": 0.389,
-       "w": 0.294,
-       "h": 0.056
-      },
-      {
-       "kind": "km",
-       "x": 0.476,
-       "y": 0.389,
-       "w": 0.394,
-       "h": 0.056
+      "file": "07-perilla-de-cambios-desgastada.jpg",
+      "label": "Perilla de cambios desgastada",
+      "nota": "Cuero de la perilla y funda con desgaste por uso.",
+      "w": 2200,
+      "h": 1650
+    }
+  ],
+  "mejoras": [
+    {
+      "file": "tuercas-de-rueda.jpg",
+      "label": "Tuercas de rueda, de acero macizo",
+      "w": 1500,
+      "h": 1126,
+      "nota": "Cambiadas todas. Las originales traen capuchón y se deforman.",
+      "historia": {
+        "carpeta": "tuercas",
+        "titulo": "Por qué no son las originales",
+        "texto": "Las tuercas originales del Fiesta son de acero pero con un capuchón de metal blando por encima. Con el uso el capuchón se hincha y se deshace, la llave de rueda deja de agarrar y después no se puede sacar la rueda. Es una falla conocida del modelo. Se cambiaron todas por tuercas de acero macizo, sin capuchón.",
+        "enlace": {
+          "texto": "Las tuercas que se pusieron",
+          "url": "https://www.amazon.com/dp/B0D9PLY77L"
+        },
+        "fotos": [
+          {
+            "file": "01.jpg",
+            "label": "Los capuchones que salieron, al lado de una tuerca de acero",
+            "w": 1500,
+            "h": 1126
+          },
+          {
+            "file": "02.jpg",
+            "label": "Una tuerca original con el capuchón ya deformado",
+            "w": 1500,
+            "h": 1126
+          },
+          {
+            "file": "03.jpg",
+            "label": "El capuchón blando, deshecho",
+            "w": 1500,
+            "h": 1998
+          }
+        ]
       }
-     ],
-     "tipo": "comprobante"
     }
-   ]
-  },
-  {
-   "id": "2025-02-03-norauto",
-   "date": "2025-02-03",
-   "workshop": "Norauto",
-   "category": "Service",
-   "notes": "Aceite Elaion 5W30, filtros de aceite, aire y habitáculo, alineación, balanceo y rotación.",
-   "mileage": 80525,
-   "scans": [
+  ],
+  "services": [
     {
-     "src": "/car/comprobantes/2025-02-03-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "km",
-       "x": 0.396,
-       "y": 0.271,
-       "w": 0.274,
-       "h": 0.044
-      },
-      {
-       "kind": "date",
-       "x": 0.246,
-       "y": 0.321,
-       "w": 0.446,
-       "h": 0.045
-      }
-     ],
-     "tipo": "comprobante"
+      "id": "2013-04-05-shell",
+      "date": "2013-04-05",
+      "workshop": "Shell",
+      "category": "Mantenimiento",
+      "notes": "Cambio de filtro de aceite.",
+      "mileage": 6073,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2013-04-05-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.3,
+              "y": 0.12,
+              "w": 0.212,
+              "h": 0.042
+            },
+            {
+              "kind": "km",
+              "x": 0.613,
+              "y": 0.12,
+              "w": 0.158,
+              "h": 0.042
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
     },
     {
-     "src": "/car/comprobantes/2025-02-03-2.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.388,
-       "y": 0.239,
-       "w": 0.179,
-       "h": 0.019
-      }
-     ],
-     "tipo": "comprobante"
+      "id": "2013-05-08-armoraut-dietrich",
+      "date": "2013-05-08",
+      "workshop": "Armoraut Dietrich",
+      "category": "Service",
+      "notes": "Alineación y balanceo. Elemento del filtro de polen.",
+      "mileage": 6071,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2013-05-08-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.634,
+              "y": 0.151,
+              "w": 0.084,
+              "h": 0.017
+            },
+            {
+              "kind": "km",
+              "x": 0.405,
+              "y": 0.784,
+              "w": 0.097,
+              "h": 0.017
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ],
+      "mileageAnomaly": true
     },
     {
-     "src": "/car/comprobantes/2025-02-03-3.jpg",
-     "w": 1400,
-     "h": 1867,
-     "tipo": "comprobante",
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.568,
-       "y": 0.262,
-       "w": 0.08,
-       "h": 0.017
-      },
-      {
-       "kind": "km",
-       "x": 0.695,
-       "y": 0.249,
-       "w": 0.096,
-       "h": 0.017
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "id": "2025-02-04-euroservice",
-   "date": "2025-02-04",
-   "workshop": "Euroservice",
-   "category": "Arreglo",
-   "notes": "Cambio del electroventilador del radiador.",
-   "mileage": 80525,
-   "scans": [
-    {
-     "src": "/car/comprobantes/2025-02-04-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.693,
-       "y": 0.101,
-       "w": 0.194,
-       "h": 0.059
-      }
-     ],
-     "tipo": "comprobante"
-    }
-   ]
-  },
-  {
-   "id": "2025-02-25-cristales-martin",
-   "date": "2025-02-25",
-   "workshop": "Cristales Martin",
-   "category": "Arreglo",
-   "notes": "Cambio del parabrisas delantero.",
-   "scans": [
-    {
-     "src": "/car/trabajos/2025-02-25-1.jpg",
-     "w": 1500,
-     "h": 2667,
-     "tipo": "foto",
-     "label": "Parabrisas retirado",
-     "highlights": []
+      "id": "2015-01-01-armoraut-dietrich",
+      "date": "2015-01-01",
+      "workshop": "Armoraut Dietrich",
+      "category": "Service",
+      "notes": "Alineación y balanceo. Filtro de aceite de motor, aceite de motor, elemento del filtro de aire y elemento del filtro de polen.",
+      "mileage": 11405,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2015-01-01-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.602,
+              "y": 0.146,
+              "w": 0.084,
+              "h": 0.017
+            },
+            {
+              "kind": "km",
+              "x": 0.38,
+              "y": 0.76,
+              "w": 0.102,
+              "h": 0.017
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
     },
     {
-     "src": "/car/trabajos/2025-02-25-2.jpg",
-     "w": 1500,
-     "h": 2000,
-     "tipo": "foto",
-     "label": "Parabrisas nuevo, antes de colocarlo",
-     "highlights": []
-    }
-   ]
-  },
-  {
-   "id": "2025-05-23-neumen",
-   "date": "2025-05-23",
-   "workshop": "Neumen",
-   "category": "Service",
-   "notes": "Balanceo.",
-   "mileage": 83000
-  },
-  {
-   "id": "2025-05-31-acevedo-serviauto",
-   "date": "2025-05-31",
-   "workshop": "Acevedo Serviauto",
-   "category": "Arreglo",
-   "notes": "Reparación del estéreo.",
-   "mileage": 83000,
-   "scans": [
-    {
-     "src": "/car/trabajos/2025-05-31-1.jpg",
-     "w": 1500,
-     "h": 1125,
-     "tipo": "foto",
-     "label": "Tablero desarmado para sacar el estéreo",
-     "highlights": []
-    }
-   ],
-   "contexto": "El módulo de audio del Fiesta Kinetic falla seguido: el sonido se corta solo, o la pantalla queda trabada en \"Ford Audio\". En Opinautos hay 322 reportes de problemas de estéreo en el Fiesta, y un hilo específico de este síntoma con más de 17 casos, casi todos de unidades 2010-2014. El origen suele estar en la plaqueta —capacitores y soldaduras frías—, no en los parlantes. Acá se repararon los capacitores de la plaqueta en vez de reemplazar el módulo entero, que cuesta varios cientos de dólares."
-  },
-  {
-   "id": "2025-10-31-embrague",
-   "date": "2025-10-31",
-   "workshop": "Embrague",
-   "category": "Arreglo",
-   "notes": "Embrague y bombín nuevos, marca Luk.",
-   "mileage": 85990,
-   "scans": [
-    {
-     "src": "/car/trabajos/2025-10-31-1.jpg",
-     "w": 1500,
-     "h": 2671,
-     "tipo": "foto",
-     "label": "Kit de embrague LuK RepSet Pro",
-     "highlights": []
+      "id": "2017-08-23-armoraut-dietrich",
+      "date": "2017-08-23",
+      "workshop": "Armoraut Dietrich",
+      "category": "Service",
+      "notes": "Líquido limpiaparabrisas, aceite de motor, elemento del filtro de aire y filtro de aceite de motor.",
+      "mileage": 24871,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2017-08-23-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.622,
+              "y": 0.165,
+              "w": 0.086,
+              "h": 0.017
+            },
+            {
+              "kind": "km",
+              "x": 0.42,
+              "y": 0.784,
+              "w": 0.097,
+              "h": 0.017
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
     },
     {
-     "src": "/car/trabajos/2025-10-31-2.jpg",
-     "w": 1500,
-     "h": 843,
-     "tipo": "foto",
-     "label": "Kit nuevo: disco, plato y bombín",
-     "highlights": []
+      "id": "2019-01-25-armoraut-dietrich",
+      "date": "2019-01-25",
+      "workshop": "Armoraut Dietrich",
+      "category": "Service",
+      "notes": "Elemento del filtro de aire, aceite de motor Elaion F50E, filtro antipolen del habitáculo y filtro de aceite BE8Z/9731/AB.",
+      "mileage": 34003,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2019-01-25-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.551,
+              "y": 0.118,
+              "w": 0.117,
+              "h": 0.024
+            },
+            {
+              "kind": "km",
+              "x": 0.48,
+              "y": 0.333,
+              "w": 0.079,
+              "h": 0.025
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
     },
     {
-     "src": "/car/trabajos/2025-10-31-3.jpg",
-     "w": 1500,
-     "h": 843,
-     "tipo": "foto",
-     "label": "El plato viejo al lado del nuevo",
-     "highlights": []
+      "id": "2019-06-26-baterias-warnes",
+      "date": "2019-06-26",
+      "workshop": "Baterías Warnes",
+      "category": "Batería",
+      "notes": "Cambio de batería.",
+      "scans": [
+        {
+          "src": "/car/comprobantes/2019-06-26-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.503,
+              "y": 0.224,
+              "w": 0.184,
+              "h": 0.04
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
     },
     {
-     "src": "/car/trabajos/2025-10-31-4.jpg",
-     "w": 1500,
-     "h": 2671,
-     "tipo": "foto",
-     "label": "Volante motor, con la caja afuera",
-     "highlights": []
+      "id": "2022-07-15-armoraut-dietrich",
+      "date": "2022-07-15",
+      "workshop": "Armoraut Dietrich",
+      "category": "Service",
+      "notes": "Quinto service anual: bulbo, elemento del filtro de aire, aceite sintético FE 530 y filtro de aceite. Además, fusibles de 20 A y lámpara 12V5W.",
+      "mileage": 58896,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2022-07-15-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.548,
+              "y": 0.084,
+              "w": 0.129,
+              "h": 0.024
+            },
+            {
+              "kind": "km",
+              "x": 0.483,
+              "y": 0.321,
+              "w": 0.079,
+              "h": 0.025
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
     },
     {
-     "src": "/car/trabajos/2025-10-31-5.jpg",
-     "w": 1500,
-     "h": 2671,
-     "tipo": "foto",
-     "label": "Caja de velocidades desmontada",
-     "highlights": []
+      "id": "2023-02-15-autocenter",
+      "date": "2023-02-15",
+      "workshop": "Autocenter",
+      "category": "Registro",
+      "notes": "Visita registrada en la planilla, sin detalle de trabajos."
+    },
+    {
+      "id": "2023-02-15-quicklane",
+      "date": "2023-02-15",
+      "workshop": "QuickLane",
+      "category": "Arreglo",
+      "notes": "Intento de reparación de un problema eléctrico."
+    },
+    {
+      "id": "2023-04-06-robayna",
+      "date": "2023-04-06",
+      "workshop": "Robayna",
+      "category": "Arreglo",
+      "notes": "Diagnóstico con IDS: DTC P2279 (fuga en el sistema de aire de admisión) y P0607 (falla del módulo de control interno). Se renovó el o-ring del cuerpo de mariposa y se lo limpió, se actualizó el software del PCM y se reinició la memoria KAM. La medición con Midtronics indicó cambiar la batería: se colocó una de 60 Ah.",
+      "mileage": 65428,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2023-04-06-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.548,
+              "y": 0.079,
+              "w": 0.119,
+              "h": 0.023
+            },
+            {
+              "kind": "km",
+              "x": 0.485,
+              "y": 0.307,
+              "w": 0.08,
+              "h": 0.025
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
+    },
+    {
+      "id": "2023-06-15-daytona",
+      "date": "2023-06-15",
+      "workshop": "Daytona",
+      "category": "Ruedas",
+      "notes": "Dos cubiertas Bridgestone Ecopia EP150 195/50 R16, alineación y balanceo.",
+      "scans": [
+        {
+          "src": "/car/comprobantes/2023-06-15-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.606,
+              "y": 0.131,
+              "w": 0.119,
+              "h": 0.022
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
+    },
+    {
+      "id": "2023-10-12-armoraut-dietrich",
+      "date": "2023-10-12",
+      "workshop": "Armoraut Dietrich",
+      "category": "Service",
+      "notes": "Sexto service anual: aceite, elemento del filtro de aire, filtro antipolen, filtro de aceite, filtro de combustible y plumillas.",
+      "mileage": 70265,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2023-10-12-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.544,
+              "y": 0.086,
+              "w": 0.119,
+              "h": 0.023
+            },
+            {
+              "kind": "km",
+              "x": 0.48,
+              "y": 0.324,
+              "w": 0.079,
+              "h": 0.025
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
+    },
+    {
+      "id": "2023-10-21-daytona",
+      "date": "2023-10-21",
+      "workshop": "Daytona",
+      "category": "Ruedas",
+      "notes": "Dos cubiertas y balanceo, pastillas de freno delanteras y amortiguadores traseros Monroe.",
+      "scans": [
+        {
+          "src": "/car/comprobantes/2023-10-21-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.834,
+              "y": 0.083,
+              "w": 0.084,
+              "h": 0.016
+            }
+          ],
+          "tipo": "comprobante"
+        },
+        {
+          "src": "/car/comprobantes/2023-10-21-2.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.59,
+              "y": 0.156,
+              "w": 0.119,
+              "h": 0.022
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
+    },
+    {
+      "id": "2024-04-24-euroservice",
+      "date": "2024-04-24",
+      "workshop": "Euroservice",
+      "category": "Service",
+      "notes": "Kit de distribución completo: correa, poleas tensoras, poleas locas y bomba de agua. El comprobante del taller anota 75.116 km.",
+      "scans": [
+        {
+          "src": "/car/comprobantes/2024-04-24-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.113,
+              "y": 0.389,
+              "w": 0.294,
+              "h": 0.056
+            },
+            {
+              "kind": "km",
+              "x": 0.476,
+              "y": 0.389,
+              "w": 0.394,
+              "h": 0.056
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
+    },
+    {
+      "id": "2025-02-03-norauto",
+      "date": "2025-02-03",
+      "workshop": "Norauto",
+      "category": "Service",
+      "notes": "Aceite Elaion 5W30, filtros de aceite, aire y habitáculo, alineación, balanceo y rotación.",
+      "mileage": 80525,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2025-02-03-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "km",
+              "x": 0.396,
+              "y": 0.271,
+              "w": 0.274,
+              "h": 0.044
+            },
+            {
+              "kind": "date",
+              "x": 0.246,
+              "y": 0.321,
+              "w": 0.446,
+              "h": 0.045
+            }
+          ],
+          "tipo": "comprobante"
+        },
+        {
+          "src": "/car/comprobantes/2025-02-03-2.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.388,
+              "y": 0.239,
+              "w": 0.179,
+              "h": 0.019
+            }
+          ],
+          "tipo": "comprobante"
+        },
+        {
+          "src": "/car/comprobantes/2025-02-03-3.jpg",
+          "w": 1400,
+          "h": 1867,
+          "tipo": "comprobante",
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.568,
+              "y": 0.262,
+              "w": 0.08,
+              "h": 0.017
+            },
+            {
+              "kind": "km",
+              "x": 0.695,
+              "y": 0.249,
+              "w": 0.096,
+              "h": 0.017
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2025-02-04-euroservice",
+      "date": "2025-02-04",
+      "workshop": "Euroservice",
+      "category": "Arreglo",
+      "notes": "Cambio del electroventilador del radiador.",
+      "mileage": 80525,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2025-02-04-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.693,
+              "y": 0.101,
+              "w": 0.194,
+              "h": 0.059
+            }
+          ],
+          "tipo": "comprobante"
+        }
+      ]
+    },
+    {
+      "id": "2025-02-25-cristales-martin",
+      "date": "2025-02-25",
+      "workshop": "Cristales Martin",
+      "category": "Arreglo",
+      "notes": "Cambio del parabrisas delantero.",
+      "scans": [
+        {
+          "src": "/car/trabajos/2025-02-25-1.jpg",
+          "w": 1500,
+          "h": 2667,
+          "tipo": "foto",
+          "label": "Parabrisas retirado",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2025-02-25-2.jpg",
+          "w": 1500,
+          "h": 2000,
+          "tipo": "foto",
+          "label": "Parabrisas nuevo, antes de colocarlo",
+          "highlights": []
+        }
+      ]
+    },
+    {
+      "id": "2025-05-23-neumen",
+      "date": "2025-05-23",
+      "workshop": "Neumen",
+      "category": "Service",
+      "notes": "Balanceo.",
+      "mileage": 83000
+    },
+    {
+      "id": "2025-05-31-acevedo-serviauto",
+      "date": "2025-05-31",
+      "workshop": "Acevedo Serviauto",
+      "category": "Arreglo",
+      "notes": "Reparación del estéreo.",
+      "mileage": 83000,
+      "scans": [
+        {
+          "src": "/car/trabajos/2025-05-31-1.jpg",
+          "w": 1500,
+          "h": 1125,
+          "tipo": "foto",
+          "label": "Tablero desarmado para sacar el estéreo",
+          "highlights": []
+        }
+      ],
+      "contexto": "El módulo de audio del Fiesta Kinetic falla seguido: el sonido se corta solo, o la pantalla queda trabada en \"Ford Audio\". En Opinautos hay 322 reportes de problemas de estéreo en el Fiesta, y un hilo específico de este síntoma con más de 17 casos, casi todos de unidades 2010-2014. El origen suele estar en la plaqueta —capacitores y soldaduras frías—, no en los parlantes. Acá se repararon los capacitores de la plaqueta en vez de reemplazar el módulo entero, que cuesta varios cientos de dólares."
+    },
+    {
+      "id": "2025-10-31-embrague",
+      "date": "2025-10-31",
+      "workshop": "Embrague",
+      "category": "Arreglo",
+      "notes": "Embrague y bombín nuevos, marca Luk.",
+      "mileage": 85990,
+      "scans": [
+        {
+          "src": "/car/trabajos/2025-10-31-1.jpg",
+          "w": 1500,
+          "h": 2671,
+          "tipo": "foto",
+          "label": "Kit de embrague LuK RepSet Pro",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2025-10-31-2.jpg",
+          "w": 1500,
+          "h": 843,
+          "tipo": "foto",
+          "label": "Kit nuevo: disco, plato y bombín",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2025-10-31-3.jpg",
+          "w": 1500,
+          "h": 843,
+          "tipo": "foto",
+          "label": "El plato viejo al lado del nuevo",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2025-10-31-4.jpg",
+          "w": 1500,
+          "h": 2671,
+          "tipo": "foto",
+          "label": "Volante motor, con la caja afuera",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2025-10-31-5.jpg",
+          "w": 1500,
+          "h": 2671,
+          "tipo": "foto",
+          "label": "Caja de velocidades desmontada",
+          "highlights": []
+        }
+      ],
+      "contexto": "El pedal se fue poniendo cada vez más duro hasta que falló el bombín. Aprovechando que había que sacar la caja, se cambió todo junto en vez de sólo la pieza rota: disco, plato y bombín nuevos, kit LuK RepSet Pro."
+    },
+    {
+      "id": "2025-12-05-caja",
+      "date": "2025-12-05",
+      "workshop": "Caja",
+      "category": "Service",
+      "notes": "Control y ajuste del nivel de la caja.",
+      "mileage": 86850,
+      "scans": [
+        {
+          "src": "/car/trabajos/2025-12-05-1.jpg",
+          "w": 1500,
+          "h": 2000,
+          "tipo": "foto",
+          "label": "Aceite de caja ELF Tranself NFX 75W",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2025-12-05-2.jpg",
+          "w": 1500,
+          "h": 2000,
+          "tipo": "foto",
+          "label": "El auto en el elevador",
+          "highlights": []
+        }
+      ]
+    },
+    {
+      "id": "2026-04-29-norauto",
+      "date": "2026-04-29",
+      "workshop": "Norauto",
+      "category": "Service",
+      "notes": "Cambio de aceite y filtros.",
+      "mileage": 89253,
+      "scans": [
+        {
+          "src": "/car/comprobantes/2026-04-29-1.jpg",
+          "w": 1400,
+          "h": 1867,
+          "tipo": "comprobante",
+          "highlights": [
+            {
+              "kind": "date",
+              "x": 0.568,
+              "y": 0.266,
+              "w": 0.08,
+              "h": 0.017
+            },
+            {
+              "kind": "km",
+              "x": 0.695,
+              "y": 0.254,
+              "w": 0.098,
+              "h": 0.017
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-07-22-euroservice",
+      "date": "2026-07-22",
+      "workshop": "Euroservice",
+      "category": "Arreglo",
+      "notes": "Cambio de las patas de motor trasera y delantera derecha.",
+      "mileage": 91000
     }
-   ],
-   "contexto": "El pedal se fue poniendo cada vez más duro hasta que falló el bombín. Aprovechando que había que sacar la caja, se cambió todo junto en vez de sólo la pieza rota: disco, plato y bombín nuevos, kit LuK RepSet Pro."
-  },
-  {
-   "id": "2025-12-05-caja",
-   "date": "2025-12-05",
-   "workshop": "Caja",
-   "category": "Service",
-   "notes": "Control y ajuste del nivel de la caja.",
-   "mileage": 86850,
-   "scans": [
+  ],
+  "giro": [
     {
-     "src": "/car/trabajos/2025-12-05-1.jpg",
-     "w": 1500,
-     "h": 2000,
-     "tipo": "foto",
-     "label": "Aceite de caja ELF Tranself NFX 75W",
-     "highlights": []
+      "file": "01.jpg",
+      "label": "Trasera",
+      "w": 1600,
+      "h": 1200
     },
     {
-     "src": "/car/trabajos/2025-12-05-2.jpg",
-     "w": 1500,
-     "h": 2000,
-     "tipo": "foto",
-     "label": "El auto en el elevador",
-     "highlights": []
-    }
-   ]
-  },
-  {
-   "id": "2026-04-29-norauto",
-   "date": "2026-04-29",
-   "workshop": "Norauto",
-   "category": "Service",
-   "notes": "Cambio de aceite y filtros.",
-   "mileage": 89253,
-   "scans": [
+      "file": "02.jpg",
+      "label": "Tres cuartos trasero derecho",
+      "w": 1600,
+      "h": 1200
+    },
     {
-     "src": "/car/comprobantes/2026-04-29-1.jpg",
-     "w": 1400,
-     "h": 1867,
-     "tipo": "comprobante",
-     "highlights": [
-      {
-       "kind": "date",
-       "x": 0.568,
-       "y": 0.266,
-       "w": 0.08,
-       "h": 0.017
-      },
-      {
-       "kind": "km",
-       "x": 0.695,
-       "y": 0.254,
-       "w": 0.098,
-       "h": 0.017
-      }
-     ]
+      "file": "03.jpg",
+      "label": "Lateral derecho",
+      "w": 1600,
+      "h": 1200
+    },
+    {
+      "file": "04.jpg",
+      "label": "Lateral derecho alto",
+      "w": 1600,
+      "h": 1200
+    },
+    {
+      "file": "05.jpg",
+      "label": "Lateral y frente derecho",
+      "w": 1600,
+      "h": 1200
+    },
+    {
+      "file": "06.jpg",
+      "label": "Tres cuartos delantero derecho",
+      "w": 1600,
+      "h": 1200
+    },
+    {
+      "file": "07.jpg",
+      "label": "Frente",
+      "w": 1600,
+      "h": 1200
     }
-   ]
-  },
-  {
-   "id": "2026-07-22-euroservice",
-   "date": "2026-07-22",
-   "workshop": "Euroservice",
-   "category": "Arreglo",
-   "notes": "Cambio de las patas de motor trasera y delantera derecha.",
-   "mileage": 91000
-  }
- ],
- "giro": [
-  {
-   "file": "01.jpg",
-   "label": "Trasera",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "file": "02.jpg",
-   "label": "Tres cuartos trasero derecho",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "file": "03.jpg",
-   "label": "Lateral derecho",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "file": "04.jpg",
-   "label": "Lateral derecho alto",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "file": "05.jpg",
-   "label": "Lateral y frente derecho",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "file": "06.jpg",
-   "label": "Tres cuartos delantero derecho",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "file": "07.jpg",
-   "label": "Frente",
-   "w": 1600,
-   "h": 1200
-  }
- ],
- "cochera": [
-  {
-   "file": "01.jpg",
-   "label": "En su lugar de siempre",
-   "w": 1600,
-   "h": 900
-  },
-  {
-   "file": "02.jpg",
-   "label": "Cochera en subsuelo",
-   "w": 1600,
-   "h": 2133
-  }
- ]
+  ],
+  "cochera": [
+    {
+      "file": "01.jpg",
+      "label": "En su lugar de siempre",
+      "w": 1600,
+      "h": 900
+    },
+    {
+      "file": "02.jpg",
+      "label": "Cochera en subsuelo",
+      "w": 1600,
+      "h": 2133
+    }
+  ],
+  "equipamiento": [
+    {
+      "titulo": "7 airbags",
+      "detalle": "De serie en el Titanium. En el rediseño de 2014 las versiones de abajo se quedaron con dos: los siete quedaron sólo en esta.",
+      "lista": [
+        "Frontal del conductor, de dos etapas",
+        "Frontal del acompañante, de dos etapas",
+        "Lateral de tórax del conductor",
+        "Lateral de tórax del acompañante",
+        "Cortina lateral izquierda",
+        "Cortina lateral derecha",
+        "De rodilla, para el conductor"
+      ]
+    }
+  ]
 }

@@ -22,9 +22,13 @@ data.services.forEach((s, i) => {
   }
 });
 
-for (const [carpeta, lista] of [['fotos', data.fotos], ['detalles', data.detalles], ['giro', data.giro], ['cochera', data.cochera]])
-  for (const a of lista)
+for (const [carpeta, lista] of [['fotos', data.fotos], ['detalles', data.detalles], ['mejoras', data.mejoras], ['giro', data.giro], ['cochera', data.cochera]])
+  for (const a of lista) {
     if (!fs.existsSync(path.join('public/car', carpeta, a.file))) errores.push(`falta la foto ${carpeta}/${a.file}`);
+    for (const h of a.historia?.fotos ?? [])
+      if (!fs.existsSync(path.join('public/car', a.historia.carpeta, h.file)))
+        errores.push(`falta la foto ${a.historia.carpeta}/${h.file}`);
+  }
 
 if (data.vehiculo.odometro < previo) errores.push('el odómetro es menor que el último service');
 
@@ -37,5 +41,6 @@ const todos = data.services.flatMap((s) => s.scans ?? []);
 console.log(
   `Contenido OK: ${data.services.length} registros, ${conRespaldo} con respaldo ` +
     `(${todos.filter((x) => x.tipo === 'comprobante').length} documentos + ${todos.filter((x) => x.tipo === 'foto').length} fotos de trabajos). ` +
-    `${data.fotos.length} fotos, ${data.giro.length} cuadros de giro, ${data.detalles.length} detalles, ${data.cochera.length} de cochera.`,
+    `${data.fotos.length} fotos, ${data.giro.length} cuadros de giro, ${data.detalles.length} detalles ` +
+    `(${data.detalles.filter((d) => d.historia).length} con historia detrás), ${data.cochera.length} de cochera.`,
 );

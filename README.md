@@ -6,9 +6,9 @@ Página de venta particular, en español, para un Ford Fiesta Kinetic Design Tit
 
 1. **Portada** — foto a sangre, nombre y los cuatro datos duros (año, odómetro, registros, precio).
 2. **Fotos** — vista giratoria de 7 cuadros (slider o arrastre) y grilla con las 15 fotos restantes. Click abre el visor.
-3. **Ficha** — perfil del auto en blanco y negro con llamadas numeradas, más la lista de datos.
+3. **Especificaciones** — perfil del auto en blanco y negro con llamadas numeradas, la lista de datos y el equipamiento destacado (los 7 airbags nombrados uno por uno, ESP/ABS, arranque en pendiente, techo solar, espejos).
 4. **Historial** — gráfico de kilometraje. Cada punto es un service; al pasar el mouse o tocarlo se abre el respaldo con la fecha y el kilometraje resaltados en amarillo. Los registros sin kilometraje anotado cuelgan de un tallo punteado hasta la curva, con el valor **estimado** por interpolación entre los dos registros que los rodean. Los registros que caen casi en el mismo punto (mismo km y pocos días de diferencia) se agrupan en un solo marcador —con un anillo alrededor— y el popup los lista a los dos; además cada marcador calcula su radio de click para que nunca se pisen. La curva va gris hasta los ~54.000 km con que se compró el auto y celeste desde ahí; el área bajo la curva sigue el mismo corte, con un rótulo por tramo. Debajo, la tabla con los 23 registros.
-5. **Detalles** — primeros planos de las marcas que tiene el auto.
+5. **Detalles** — primeros planos de las marcas que tiene el auto. Los que tienen una `historia` detrás muestran un botón **(i)** en la esquina que abre las fotos de contexto con su explicación.
 6. **Cochera** — fotos del auto guardado bajo techo.
 7. **Precio** — USD 9.500 y el mail de contacto.
 
@@ -17,9 +17,11 @@ Página de venta particular, en español, para un Ford Fiesta Kinetic Design Tit
 Todo el contenido vive en `content/car.json`. No hay CMS ni base de datos.
 
 - `vehiculo` — datos del auto, odómetro y precio.
-- `fotos` / `detalles` — archivos en `public/car/fotos/` y `public/car/detalles/`, con `label`, `nota` y dimensiones.
+- `fotos` / `detalles` / `mejoras` — archivos en `public/car/fotos/`, `public/car/detalles/` y `public/car/mejoras/`, con `label`, `nota` y dimensiones. `mejoras` son cosas que se cambiaron para mejor (no marcas), con el mismo formato que `detalles`.
 - `giro` — los cuadros de la vuelta al auto, en `public/car/giro/`, **en orden de giro**. El slider los recorre en ese orden.
 - `cochera` — fotos de las cocheras, en `public/car/cochera/`.
+- `equipamiento` — el equipamiento destacado. Un item con `lista` se muestra a ancho completo y numerado (los airbags).
+- `detalles[].historia` / `mejoras[].historia` — opcional: `{ carpeta, titulo, texto, enlace?, fotos[] }`. Dispara el botón (i) y el visor con texto. Las fotos viven en `public/car/<carpeta>/`.
 - `services` — los 23 registros. Cada uno puede tener `scans`, y cada scan lleva sus `highlights`. El campo opcional `contexto` es un párrafo que explica la reparación; aparece sólo en el popup del gráfico.
 - `vehiculo.compraKm` — kilometraje con el que se compró el auto. La fecha de la marca en el gráfico se deduce cruzando ese valor con la curva, no está guardada.
 
@@ -57,4 +59,4 @@ npm run build
 
 ## Datos personales
 
-Los comprobantes de Norauto traen DNI, teléfono y correo del titular. Antes de publicarlos se difumina ese bloque; el nombre queda. Lo mismo con la patente de autos ajenos que aparezcan en las fotos. Si agregás un comprobante nuevo, revisá esto primero.
+Los comprobantes de Norauto traen DNI, teléfono y correo del titular. Antes de publicarlos se difumina ese bloque; el nombre queda. Lo mismo con la patente de autos ajenos y con **la cara de cualquier persona** que aparezca en las fotos: la toma de la cámara de seguridad del incidente va con la cara difuminada. Si agregás una foto nueva, revisá esto primero.

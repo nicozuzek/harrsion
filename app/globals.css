@@ -60,6 +60,7 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .seccion { padding: clamp(5rem, 11vh, 8.5rem) var(--gutter); }
 .seccion-intro { max-width: 46ch; margin-bottom: 3.5rem; }
 .seccion-intro p { color: var(--grafito); margin: 1.2rem 0 0; }
+.seccion-lede { color: var(--grafito); max-width: 46ch; margin: 0 0 2.5rem; }
 
 /* ---------- header ---------- */
 
@@ -77,7 +78,7 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   border-bottom: 1px solid var(--linea);
 }
 
-.marca { display: flex; align-items: center; gap: 0.75rem; }
+.marca { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; }
 .marca img { width: 44px; height: auto; }
 .marca strong {
   font-variation-settings: 'wdth' 112;
@@ -168,7 +169,7 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .giro { margin-bottom: 3.5rem; }
 .giro-escena {
   position: relative;
-  width: min(100%, calc(56vh * 4 / 3));
+  width: min(100%, calc(66vh * 4 / 3));
   margin-inline: auto;
   background: var(--chapa);
   cursor: ew-resize;
@@ -197,12 +198,15 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .giro input[type='range'] {
   flex: 1;
   appearance: none;
-  height: 3px;
-  background: var(--linea);
+  height: 44px;
+  background: transparent;
   cursor: pointer;
 }
+.giro input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--linea); }
+.giro input[type='range']::-moz-range-track { height: 3px; background: var(--linea); }
 .giro input[type='range']::-webkit-slider-thumb {
   appearance: none;
+  margin-top: -11.5px;
   width: 26px;
   height: 26px;
   border-radius: 50%;
@@ -242,8 +246,26 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 
 /* ---------- ficha técnica ---------- */
 
-.placa { position: relative; margin-bottom: 3rem; }
-.placa > img { width: 100%; height: auto; }
+/* la foto se achica para que entre junto con la lista en la pantalla */
+.placa { position: relative; margin: 0 auto 2.5rem; width: min(100%, calc(55vh * 1700 / 816)); }
+.placa > img { width: 100%; height: auto; display: block; }
+.placa-leyenda {
+  position: absolute;
+  left: 0;
+  bottom: -2rem;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--grafito);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.4rem;
+}
+.placa-leyenda b {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--fluo); color: var(--asfalto);
+  font-size: 0.7rem; display: inline-flex; align-items: center; justify-content: center;
+}
 
 .llamada {
   position: absolute;
@@ -260,7 +282,14 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   box-shadow: 0 0 0 4px rgba(22, 24, 26, 0.55);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
+.llamada.activa { transform: translate(-50%, -50%) scale(1.25); z-index: 1; }
+.llamada.apagada { opacity: 0.35; }
+.llamada:focus-visible { outline: 2px solid var(--asfalto); outline-offset: 2px; }
 
 .claves {
   list-style: none;
@@ -291,8 +320,49 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   justify-content: center;
   align-self: flex-start;
 }
+.claves li { transition: opacity 0.18s ease; }
+.claves li.apagada { opacity: 0.3; }
+.claves li.activa b { background: var(--fluo); color: var(--asfalto); }
 .claves strong { display: block; font-size: 1.05rem; }
 .claves small { color: var(--grafito); font-size: 0.82rem; }
+
+/* equipamiento destacado */
+.equipamiento {
+  list-style: none;
+  margin: 3.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  border-top: 2px solid var(--asfalto);
+}
+.equipamiento > li { padding: 1.4rem 1.5rem 1.4rem 0; border-bottom: 1px solid var(--linea); }
+.equipamiento > li.ancho { grid-column: 1 / -1; }
+.equipamiento strong { display: block; font-size: 1.15rem; font-variation-settings: 'wdth' 108; }
+.equipamiento p { color: var(--grafito); font-size: 0.85rem; margin: 0.35rem 0 0; max-width: 52ch; }
+
+.airbags {
+  list-style: none;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem 1.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.airbags li { display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.85rem; }
+.airbags span {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--fluo);
+  color: var(--asfalto);
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ---------- historial / gráfico ---------- */
 
@@ -360,6 +430,19 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .compra text { fill: var(--fluo); font-size: 13px; font-variant-numeric: tabular-nums; }
 
 .rail-nota { fill: #6c7370; font-size: 12px; }
+
+/* versión compacta (teléfono en vertical): mismo dibujo, letras y puntos más grandes
+   para que sigan leyéndose cuando el SVG se escala al ancho de la pantalla */
+.grafico.compacto .eje-texto, .grafico.compacto .compra text { font-size: 19px; }
+.grafico.compacto .rail-nota { font-size: 16px; }
+.grafico.compacto .tramo-nota { font-size: 17px; stroke-width: 6px; }
+.grafico.compacto .trazo { stroke-width: 4; }
+.grafico.compacto .punto circle.nucleo { r: 8; stroke-width: 3.5; }
+.grafico.compacto .punto:hover circle.nucleo, .grafico.compacto .punto.activo circle.nucleo, .grafico.compacto .punto:focus-visible circle.nucleo { r: 11; }
+.grafico.compacto .anillo { r: 13; }
+.grafico.compacto .estimado-punto { r: 6.5; stroke-width: 2.5; }
+.grafico.compacto .estimado-anillo { r: 12; }
+.grafico.compacto .estimado-tallo { stroke-width: 2; }
 
 @media (prefers-reduced-motion: no-preference) {
   .trazo.dibujar { stroke-dasharray: var(--largo); stroke-dashoffset: var(--largo); }
@@ -431,7 +514,30 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 
 /* lista de respaldo, también es el contenido accesible */
 
-.registros { margin-top: 4rem; border-top: 1px solid #32363800; }
+.registros { margin-top: 3.5rem; }
+.registros > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.3rem;
+  border: 1px solid #333739;
+  border-radius: 100px;
+  font-size: 0.86rem;
+  color: var(--chapa);
+}
+.registros > summary::-webkit-details-marker { display: none; }
+.registros > summary:hover { border-color: var(--celeste); color: var(--celeste); }
+.registros > summary::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+}
+.registros[open] > summary::after { transform: rotate(225deg) translate(-2px, -2px); }
 .registros table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
 .registros th {
   text-align: left;
@@ -445,7 +551,14 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .registros tr:hover td { background: #1d2022; }
 .registros .col-km { text-align: right; white-space: nowrap; }
 .registros .col-obs { color: #9aa29e; }
-.registros button { cursor: pointer; text-decoration: underline; font-size: 0.78rem; color: var(--celeste); }
+.registros button {
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.78rem;
+  color: var(--celeste);
+  padding: 0.7rem 0.4rem;
+  margin: -0.7rem -0.4rem;
+}
 
 /* ---------- detalles ---------- */
 
@@ -454,10 +567,29 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   gap: 1.4rem;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
 }
-.detalles-grid button { cursor: pointer; text-align: left; }
+.detalle { position: relative; }
+.detalle-foto { display: block; width: 100%; cursor: pointer; }
 .detalles-grid img { width: 100%; height: 260px; object-fit: cover; }
 .detalles-grid strong { display: block; font-size: 0.95rem; margin-top: 0.7rem; }
-.detalles-grid small { color: var(--grafito); font-size: 0.8rem; }
+.detalles-grid small { color: var(--grafito); font-size: 0.8rem; display: block; }
+
+/* el (i) cuenta de dónde salió la marca */
+.detalle-info {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(22, 24, 26, 0.72);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  cursor: pointer;
+}
+.detalle-info:hover { background: var(--asfalto); }
 
 .cochera { background: var(--chapa-hueco); }
 .cochera-grid {
@@ -470,6 +602,15 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .cochera-grid figcaption { font-size: 0.8rem; color: var(--grafito); padding-top: 0.6rem; }
 
 .visor-cuenta { color: #8e9693; margin-left: 0.6rem; }
+.visor-historia {
+  max-width: 58ch;
+  margin: 1rem auto 0;
+  text-align: left;
+  color: #cdd2cf;
+}
+.visor-historia h3 { font-size: 1.05rem; color: #fff; margin: 0 0 0.4rem; font-variation-settings: 'wdth' 100; }
+.visor-historia p { font-size: 0.86rem; line-height: 1.6; margin: 0; }
+.visor-historia a { display: inline-block; margin-top: 0.7rem; font-size: 0.82rem; text-decoration: underline; color: var(--celeste); }
 
 /* ---------- precio ---------- */
 
@@ -551,10 +692,14 @@ footer {
   .header nav { display: none; }
   .musica a { display: none; }
   .rejilla img { height: 240px; }
+  .detalle-info { width: 44px; height: 44px; top: 8px; right: 8px; }
+  .equipamiento > li { padding-right: 0; }
+  .placa { width: 100%; margin-bottom: 3rem; }
+  .llamada { width: 34px; height: 34px; }
+  .visor-historia { max-width: none; }
+  .registros > summary { width: 100%; justify-content: space-between; }
   .globo { position: fixed; left: 50%; bottom: 1rem; top: auto; transform: translateX(-50%); width: calc(100vw - 2rem); }
   .visor-nav.prev { left: 0; }
   .visor-nav.sig { right: 0; }
   .registros .col-obs { display: none; }
-  .grafico-caja { overflow-x: auto; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
-  .grafico-lienzo { min-width: 620px; }
 }

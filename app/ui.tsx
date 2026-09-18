@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, Mail, Pause, Play, RotateCw, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Info, Mail, Pause, Play, RotateCw, X } from 'lucide-react';
 
 export type Resalte = { kind: 'date' | 'km'; x: number; y: number; w: number; h: number };
 export type Escaneo = { src: string; w: number; h: number; highlights: Resalte[]; tipo: 'comprobante' | 'foto'; label?: string };
@@ -17,9 +17,17 @@ export type Servicio = {
   mileageAnomaly?: boolean;
   scans?: Escaneo[];
 };
-export type Foto = { file: string; label: string; w: number; h: number; shot?: string; nota?: string };
+export type Historia = {
+  carpeta: string;
+  titulo: string;
+  texto: string;
+  enlace?: { texto: string; url: string };
+  fotos: Foto[];
+};
+export type Foto = { file: string; label: string; w: number; h: number; shot?: string; nota?: string; historia?: Historia };
 export type Cuadro = { file: string; label: string; w: number; h: number };
 export type Cochera = { file: string; label: string; w: number; h: number };
+export type Equipo = { titulo: string; detalle: string; lista?: string[] };
 export type Vehiculo = {
   nombre: string;
   modelo: string;
@@ -50,11 +58,21 @@ const CANCION = {
 
 /* Callout anchors, as fractions of the profile plate. */
 const LLAMADAS = [
-  { n: 1, x: 0.13, y: 0.40, titulo: '1.6 TiVCT nafta', pie: 'Como figura en las facturas de Dietrich' },
-  { n: 2, x: 0.36, y: 0.31, titulo: 'Caja manual de 5', pie: 'Sin embrague desde octubre de 2025' },
+  { n: 1, x: 0.13, y: 0.4, titulo: '1.6 TiVCT nafta', pie: 'Como figura en las facturas de Dietrich' },
+  { n: 2, x: 0.5, y: 0.66, titulo: 'Caja manual de 5', pie: 'Sin embrague desde octubre de 2025' },
   { n: 3, x: 0.55, y: 0.45, titulo: '5 puertas', pie: 'Carrocería Kinetic Design, versión Titanium' },
-  { n: 4, x: 0.13, y: 0.76, titulo: 'Llantas de aleación 16"', pie: 'Cubiertas 195/50 R16' },
+  { n: 4, x: 0.84, y: 0.75, titulo: 'Llantas de aleación 16"', pie: 'Cubiertas 195/50 R16' },
   { n: 5, x: 0.9, y: 0.32, titulo: 'Portón trasero', pie: 'Parabrisas delantero cambiado en 2025' },
+];
+
+const EQUIPO: { n: number; x: number; y: number; titulo: string; pie?: string }[] = [
+  { n: 7, x: 0.68, y: 0.26, titulo: '7 airbags' },
+  { n: 8, x: 0.2, y: 0.77, titulo: 'Control de estabilidad (ESP) y ABS' },
+  { n: 9, x: 0.3, y: 0.71, titulo: 'Asistencia de arranque en pendiente' },
+  { n: 10, x: 0.55, y: 0.09, titulo: 'Techo solar eléctrico' },
+  { n: 11, x: 0.32, y: 0.29, titulo: 'Espejo interior fotocromático' },
+  { n: 12, x: 0.35, y: 0.42, titulo: 'Espejos exteriores con visor de punto ciego' },
+  { n: 13, x: 0.46, y: 0.27, titulo: 'Dirección eléctrica' },
 ];
 
 const VOLUMEN = 0.5;
@@ -198,9 +216,43 @@ function Escaneado({ escaneo, alt }: { escaneo: Escaneo; alt: string }) {
 
 type Vista =
   | { tipo: 'foto'; lista: Foto[]; i: number; carpeta: string }
-  | { tipo: 'escaneo'; lista: Escaneo[]; i: number; pie: string };
+  | { tipo: 'escaneo'; lista: Escaneo[]; i: number; pie: string }
+  | { tipo: 'historia'; lista: Foto[]; i: number; carpeta: string; historia: Historia };
+
+function Tarjetas({ lista, carpeta, abrir }: { lista: Foto[]; carpeta: string; abrir: (v: Vista) => void }) {
+  if (!lista.length) return <p className="vacio">Agregá imágenes a public/car/{carpeta}/ para mostrarlas acá.</p>;
+  return (
+    <div className="detalles-grid">
+      {lista.map((f, i) => (
+        <div key={f.file} className="detalle">
+          <button className="detalle-foto" onClick={() => abrir({ tipo: 'foto', lista, i, carpeta })} aria-label={`Ampliar: ${f.label}`}>
+            <Image src={`/car/${carpeta}/${f.file}`} alt={f.label} width={f.w} height={f.h} sizes="(max-width: 860px) 90vw, 380px" />
+          </button>
+          {f.historia && (
+            <button
+              className="detalle-info"
+              onClick={() => abrir({ tipo: 'historia', lista: f.historia!.fotos, i: 0, carpeta: f.historia!.carpeta, historia: f.historia! })}
+              aria-label={`${f.historia.titulo}. Ver ${f.historia.fotos.length} fotos.`}
+            >
+              <Info size={16} />
+            </button>
+          )}
+          <strong>{f.label}</strong>
+          {f.nota && <small>{f.nota}</small>}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mover: (d: number) => void }) {
+  // con el visor abierto la página de atrás no se mueve
+  useEffect(() => {
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previo; };
+  }, []);
+
   useEffect(() => {
     const tecla = (e: KeyboardEvent) => {
       if (e.key === 'Escape') cerrar();
@@ -213,16 +265,16 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
 
   const actual = vista.lista[vista.i];
   const pie =
-    vista.tipo === 'foto'
-      ? (actual as Foto).label
-      : [vista.pie, (actual as Escaneo).label].filter(Boolean).join(' · ');
+    vista.tipo === 'escaneo'
+      ? [vista.pie, (actual as Escaneo).label].filter(Boolean).join(' · ')
+      : (actual as Foto).label;
   const varias = vista.lista.length > 1;
 
   return (
     <div className="visor" role="dialog" aria-modal="true" aria-label={pie} onClick={cerrar}>
       <figure className="visor-marco" onClick={(e) => e.stopPropagation()}>
         <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
-        {vista.tipo === 'foto' ? (
+        {vista.tipo !== 'escaneo' ? (
           <Image
             src={`/car/${vista.carpeta}/${(actual as Foto).file}`}
             alt={(actual as Foto).label}
@@ -243,33 +295,70 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
           {pie}
           {varias && <span className="visor-cuenta dato"> {vista.i + 1} / {vista.lista.length}</span>}
         </figcaption>
+        {vista.tipo === 'historia' && (
+          <div className="visor-historia">
+            <h3>{vista.historia.titulo}</h3>
+            <p>{vista.historia.texto}</p>
+            {vista.historia.enlace && (
+              <a href={vista.historia.enlace.url} target="_blank" rel="noreferrer noopener">
+                {vista.historia.enlace.texto}
+              </a>
+            )}
+          </div>
+        )}
       </figure>
     </div>
   );
 }
 
-const ANCHO = 1000;
-const ALTO = 420;
-const PAD = { izq: 76, der: 26, arr: 28, aba: 64 };
+// el gráfico tiene dos sistemas de coordenadas: uno ancho para escritorio y uno
+// compacto para el teléfono en vertical, donde entra a lo ancho sin scroll
+const DIMS = {
+  amplio: { ANCHO: 1000, ALTO: 420, PAD: { izq: 76, der: 26, arr: 28, aba: 64 } },
+  compacto: { ANCHO: 560, ALTO: 480, PAD: { izq: 70, der: 18, arr: 36, aba: 80 } },
+};
+
+function useCompacto() {
+  const [compacto, setCompacto] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 860px)');
+    const leer = () => setCompacto(mq.matches);
+    leer();
+    mq.addEventListener('change', leer);
+    return () => mq.removeEventListener('change', leer);
+  }, []);
+  return compacto;
+}
 
 export default function Pagina({
   vehiculo,
   fotos,
   giro,
   detalles,
+  mejoras,
   cochera,
+  equipamiento,
   services,
 }: {
   vehiculo: Vehiculo;
   fotos: Foto[];
   giro: Cuadro[];
   detalles: Foto[];
+  mejoras: Foto[];
   cochera: Cochera[];
+  equipamiento: Equipo[];
   services: Servicio[];
 }) {
+  const compacto = useCompacto();
+  const { ANCHO, ALTO, PAD } = compacto ? DIMS.compacto : DIMS.amplio;
   const [vista, setVista] = useState<Vista | null>(null);
   const [activo, setActivo] = useState<string | null>(null);
   const [fijo, setFijo] = useState(false);
+  // llamada de la ficha resaltada (hover en escritorio, toque en móvil)
+  const [llamada, setLlamada] = useState<number | null>(null);
+  const [llamadaFija, setLlamadaFija] = useState(false);
+  const claseClave = (n: number) => (llamada == null ? undefined : llamada === n ? 'activa' : 'apagada');
+  const claveActiva = llamada != null ? [...LLAMADAS, ...EQUIPO].find((l) => l.n === llamada) ?? null : null;
   const [dibujado, setDibujado] = useState(false);
   const caja = useRef<HTMLDivElement>(null);
 
@@ -349,7 +438,7 @@ export default function Pagina({
     }
 
     const anios: { a: string; x: number }[] = [];
-    for (let a = 2013; a <= 2026; a += 2) {
+    for (let a = 2013; a <= 2026; a += compacto ? 3 : 2) {
       const x = px(`${a}-01-01`);
       if (x >= PAD.izq - 4 && x <= ANCHO - PAD.der) anios.push({ a: String(a), x });
     }
@@ -396,7 +485,7 @@ export default function Pagina({
     );
 
     return { puntos, ejeX: anios, ejeY, tramos, base, ultimo: puntos[puntos.length - 1], marcadores, marcasEstimadas, compra };
-  }, [conKm, sinKm, vehiculo.odometro, vehiculo.odometroFecha, vehiculo.compraKm]);
+  }, [conKm, sinKm, vehiculo.odometro, vehiculo.odometroFecha, vehiculo.compraKm, ANCHO, ALTO, PAD, compacto]);
 
   useEffect(() => {
     if (!caja.current) return;
@@ -475,10 +564,6 @@ export default function Pagina({
         </section>
 
         <section id="fotos" className="seccion fotos">
-          <div className="seccion-intro">
-            <h2>El auto, hoy</h2>
-            <p>Fotos del {fecha('2026-09-13')}, sin retoque. Arrastrá para dar la vuelta al auto.</p>
-          </div>
           {giro.length > 0 && <Giro cuadros={giro} />}
           <div className="rejilla">
             {fotos.map((f, i) => (
@@ -495,30 +580,66 @@ export default function Pagina({
 
         <section id="ficha" className="seccion">
           <div className="seccion-intro">
-            <h2>Qué es exactamente</h2>
-            <p>
-              {vehiculo.modelo}, {vehiculo.anio}. Los datos salen de las facturas del concesionario, no de un aviso.
-            </p>
+            <h2>Especificaciones</h2>
           </div>
-          <div className="placa">
+          <div className="placa" onMouseLeave={() => !llamadaFija && setLlamada(null)}>
             <Image src="/brand/perfil.jpg" alt="Perfil izquierdo del Ford Fiesta" width={1700} height={816} sizes="100vw" />
-            {LLAMADAS.map((l) => (
-              <span key={l.n} className="llamada dato" style={{ left: `${l.x * 100}%`, top: `${l.y * 100}%` }} aria-hidden="true">
+            {[...LLAMADAS, ...EQUIPO].map((l) => (
+              <button
+                key={l.n}
+                type="button"
+                className={`llamada dato${llamada === l.n ? ' activa' : ''}${llamada != null && llamada !== l.n ? ' apagada' : ''}`}
+                style={{ left: `${l.x * 100}%`, top: `${l.y * 100}%` }}
+                aria-label={l.titulo}
+                aria-pressed={llamadaFija && llamada === l.n}
+                onMouseEnter={() => !llamadaFija && setLlamada(l.n)}
+                onFocus={() => !llamadaFija && setLlamada(l.n)}
+                onBlur={() => !llamadaFija && setLlamada(null)}
+                onClick={() => {
+                  if (llamadaFija && llamada === l.n) { setLlamadaFija(false); setLlamada(null); }
+                  else { setLlamada(l.n); setLlamadaFija(true); }
+                }}
+              >
                 {l.n}
-              </span>
+              </button>
             ))}
+            <p className="placa-leyenda dato" aria-live="polite">
+              {claveActiva ? <><b>{claveActiva.n}</b> {claveActiva.titulo}</> : 'Pasá por un número para ver qué es'}
+            </p>
           </div>
           <ul className="claves">
             {LLAMADAS.map((l) => (
-              <li key={l.n}>
+              <li key={l.n} className={claseClave(l.n)} onMouseEnter={() => !llamadaFija && setLlamada(l.n)} onMouseLeave={() => !llamadaFija && setLlamada(null)}>
                 <b className="dato">{l.n}</b>
                 <span><strong>{l.titulo}</strong><small>{l.pie}</small></span>
               </li>
             ))}
-            <li>
+            <li className={claseClave(6)}>
               <b className="dato">6</b>
               <span><strong>{km(vehiculo.odometro)} km</strong><small>Odómetro al {fecha(vehiculo.odometroFecha)}</small></span>
             </li>
+            {EQUIPO.map((l) => (
+              <li key={l.n} className={claseClave(l.n)} onMouseEnter={() => !llamadaFija && setLlamada(l.n)} onMouseLeave={() => !llamadaFija && setLlamada(null)}>
+                <b className="dato">{l.n}</b>
+                <span><strong>{l.titulo}</strong>{l.pie && <small>{l.pie}</small>}</span>
+              </li>
+            ))}
+          </ul>
+
+          <ul className="equipamiento">
+            {equipamiento.map((e) => (
+              <li key={e.titulo} className={e.lista ? 'ancho' : undefined}>
+                <strong>{e.titulo}</strong>
+                <p>{e.detalle}</p>
+                {e.lista && (
+                  <ol className="airbags dato">
+                    {e.lista.map((a, i) => (
+                      <li key={a}><span>{i + 1}</span>{a}</li>
+                    ))}
+                  </ol>
+                )}
+              </li>
+            ))}
           </ul>
         </section>
 
@@ -529,7 +650,7 @@ export default function Pagina({
 
           <div className="grafico-caja">
             <div className="grafico-lienzo" ref={caja}>
-            <svg className="grafico" viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img"
+            <svg className={`grafico${compacto ? ' compacto' : ''}`} viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img"
               aria-label={`Kilometraje registrado entre ${anio(services[0].date)} y ${anio(vehiculo.odometroFecha)}, de ${km(conKm[0].mileage!)} a ${km(vehiculo.odometro)} kilómetros. El detalle completo está en la tabla que sigue.`}>
               <defs>
                 <linearGradient id="degradado" x1="0" y1="0" x2="0" y2="1">
@@ -568,17 +689,6 @@ export default function Pagina({
                 />
               ))}
               {compra && <line className="corte" x1={compra.cx} y1={compra.cy} x2={compra.cx} y2={base} />}
-              {tramos.length > 1 && (
-                <>
-                  <text className="tramo-nota previo" x={(tramos[0].x0 + tramos[0].x1) / 2} y={base - 16} textAnchor="middle">
-                    Dueño anterior, hasta ~{km(compra!.km)} km
-                  </text>
-                  <text className="tramo-nota" x={(tramos[1].x0 + tramos[1].x1) / 2} y={base - 16} textAnchor="middle">
-                    Desde que lo compré
-                  </text>
-                </>
-              )}
-
               {marcasEstimadas.map((m) => (
                 <g
                   key={m.id}
@@ -599,7 +709,9 @@ export default function Pagina({
               ))}
 
               <text className="rail-nota" x={PAD.izq} y={ALTO - 12}>
-                Líneas punteadas: {sinKm.length} registros sin kilometraje anotado, estimado sobre la curva
+                {compacto
+                  ? `Punteado: ${sinKm.length} registros sin km, estimados`
+                  : `Líneas punteadas: ${sinKm.length} registros sin kilometraje anotado, estimado sobre la curva`}
               </text>
 
               {marcadores.map((m) => (
@@ -626,6 +738,17 @@ export default function Pagina({
                 </g>
               ))}
 
+              {tramos.length > 1 && (
+                <>
+                  <text className="tramo-nota previo" x={(tramos[0].x0 + tramos[0].x1) / 2} y={base - 16} textAnchor="middle">
+                    {compacto ? 'Dueño anterior' : `Dueño anterior, hasta ~${km(compra!.km)} km`}
+                  </text>
+                  <text className="tramo-nota" x={(tramos[1].x0 + tramos[1].x1) / 2} y={base - 16} textAnchor="middle">
+                    Dueño actual
+                  </text>
+                </>
+              )}
+
               <text className="eje-texto" x={ultimo.cx} y={ultimo.cy - 18} textAnchor="end" fill="#7cc7f0">
                 {km(vehiculo.odometro)} km
               </text>
@@ -634,6 +757,8 @@ export default function Pagina({
             {marcadorActivo && (
               <Globo
                 marcador={marcadorActivo}
+                ancho={ANCHO}
+                alto={ALTO}
                 vehiculo={vehiculo}
                 fijo={fijo}
                 cerrar={cerrarGlobo}
@@ -643,11 +768,14 @@ export default function Pagina({
             </div>
           </div>
 
-          <div className="registros">
+          <details className="registros">
+            <summary>
+              <span>Ver los {services.length} registros, uno por uno</span>
+            </summary>
             <div className="registros-scroll">
             <table>
-              <caption className="visually-hidden" style={{ textAlign: 'left', paddingBottom: '1rem', fontSize: '0.78rem', color: '#7d8481' }}>
-                Los {services.length} registros, del más viejo al más nuevo.
+              <caption style={{ textAlign: 'left', padding: '1rem 0', fontSize: '0.78rem', color: '#7d8481' }}>
+                Del más viejo al más nuevo.
               </caption>
               <thead>
                 <tr>
@@ -679,34 +807,29 @@ export default function Pagina({
               </tbody>
             </table>
             </div>
-          </div>
+          </details>
         </section>
 
         <section id="detalles" className="seccion">
           <div className="seccion-intro">
             <h2>Detalles</h2>
-            <p>Las marcas que tiene el auto, fotografiadas de cerca. Están todas acá para que no haya sorpresas.</p>
           </div>
-          {detalles.length ? (
-            <div className="detalles-grid">
-              {detalles.map((f, i) => (
-                <button key={f.file} onClick={() => setVista({ tipo: 'foto', lista: detalles, i, carpeta: 'detalles' })}>
-                  <Image src={`/car/detalles/${f.file}`} alt={f.label} width={f.w} height={f.h} sizes="(max-width: 860px) 90vw, 380px" />
-                  <strong>{f.label}</strong>
-                  {f.nota && <small>{f.nota}</small>}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <p className="vacio">Agregá imágenes a public/car/detalles/ para mostrarlas acá.</p>
-          )}
+          <Tarjetas lista={detalles} carpeta="detalles" abrir={setVista} />
         </section>
+
+        {mejoras.length > 0 && (
+          <section id="mejoras" className="seccion">
+            <div className="seccion-intro">
+              <h2>Mejoras</h2>
+            </div>
+            <Tarjetas lista={mejoras} carpeta="mejoras" abrir={setVista} />
+          </section>
+        )}
 
         {cochera.length > 0 && (
           <section id="cochera" className="seccion cochera">
             <div className="seccion-intro">
               <h2>Siempre durmió en cochera</h2>
-              <p>Nunca pasó una noche en la calle.</p>
             </div>
             <div className="cochera-grid">
               {cochera.map((c, i) => (
@@ -808,12 +931,16 @@ function FilaGlobo({
 
 function Globo({
   marcador,
+  ancho,
+  alto,
   vehiculo,
   fijo,
   cerrar,
   ampliar,
 }: {
   marcador: { cx: number; cy: number; entradas: EntradaGlobo[] };
+  ancho: number;
+  alto: number;
   vehiculo: Vehiculo;
   fijo: boolean;
   cerrar: () => void;
@@ -821,12 +948,12 @@ function Globo({
 }) {
   const { cx, cy, entradas } = marcador;
   const varias = entradas.length > 1;
-  const derecha = cx > ANCHO * 0.58;
-  const abajo = cy < ALTO * 0.42;
+  const derecha = cx > ancho * 0.58;
+  const abajo = cy < alto * 0.42;
 
   const estilo: React.CSSProperties = {
-    left: `${(cx / ANCHO) * 100}%`,
-    top: `${(cy / ALTO) * 100}%`,
+    left: `${(cx / ancho) * 100}%`,
+    top: `${(cy / alto) * 100}%`,
     transform: `translate(${derecha ? 'calc(-100% - 18px)' : '18px'}, ${abajo ? '0%' : '-100%'})`,
   };
 
