@@ -1,39 +1,853 @@
 'use client';
-import { useMemo, useRef, useState } from 'react';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { ArrowDown, ArrowUpRight, ChevronDown, Disc3, Mail, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Mail, Pause, Play, RotateCw, X } from 'lucide-react';
 
-export type Service = { id:string; date:string; workshop:string; category:string; mileage?:number; mileageAnomaly?:boolean; summary:string; notes:string };
-export type Asset = {name:string; src:string; date?:string; isPdf:boolean; label:string};
-const fmtDate = (d:string) => new Intl.DateTimeFormat('es-AR',{dateStyle:'medium'}).format(new Date(`${d}T12:00:00`));
-const fmtKm = (n:number) => new Intl.NumberFormat('es-AR').format(n);
-const preview = 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/54/3d/ef543d55-58cb-320e-8dc7-084336d961d0/mzaf_15679467696516524072.plus.aac.p.m4a';
-const art = 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e6/8a/68/e68a688e-129e-cb9d-938f-bc3ee37059ae/075679930910.jpg/300x300bb.jpg';
+export type Resalte = { kind: 'date' | 'km'; x: number; y: number; w: number; h: number };
+export type Escaneo = { src: string; w: number; h: number; highlights: Resalte[]; tipo: 'comprobante' | 'foto'; label?: string };
+export type Servicio = {
+  id: string;
+  contexto?: string;
+  date: string;
+  workshop: string;
+  category: string;
+  notes: string;
+  mileage?: number;
+  mileageAnomaly?: boolean;
+  scans?: Escaneo[];
+};
+export type Foto = { file: string; label: string; w: number; h: number; shot?: string; nota?: string };
+export type Cuadro = { file: string; label: string; w: number; h: number };
+export type Cochera = { file: string; label: string; w: number; h: number };
+export type Vehiculo = {
+  nombre: string;
+  modelo: string;
+  anio: number;
+  puertas: number;
+  motor: string;
+  caja: string;
+  odometro: number;
+  odometroFecha: string;
+  cubiertas: string;
+  compraKm?: number;
+  precioUsd: number;
+  contacto: string;
+};
 
-function MusicControl() {
-  const [playing,setPlaying]=useState(false); const [failed,setFailed]=useState(false); const audio=useRef<HTMLAudioElement>(null);
-  const toggle=()=>{ if(!audio.current || failed) return; if(playing) { audio.current.pause(); setPlaying(false); } else { audio.current.play().then(()=>setPlaying(true)).catch(()=>{setPlaying(false);setFailed(true)}); } };
-  return <div className={`music ${playing?'is-playing':'is-paused'} ${failed?'is-failed':''}`}><audio ref={audio} src={preview} preload="none" onEnded={()=>setPlaying(false)} onError={()=>{setPlaying(false);setFailed(true)}}/><button className="music-button" aria-pressed={playing} aria-label={failed?'No se pudo cargar la canción':playing?'Pausar See You Again':'Reproducir See You Again'} onClick={toggle} disabled={failed}><span className="record"><Image src={art} alt="Portada de See You Again" width={48} height={48}/><span className="record-hole"/></span>{playing?<Pause size={14}/>:<Play size={14}/>}</button><span className="music-copy"><small>{failed?'Audio no disponible':playing?'Reproduciendo':'En pausa'}</small><a href="https://music.apple.com/us/album/see-you-again-feat-charlie-puth/966411595?i=966411602" target="_blank" rel="noreferrer">See You Again</a></span></div>;
+const km = (n: number) => new Intl.NumberFormat('es-AR').format(n);
+const usd = (n: number) => new Intl.NumberFormat('es-AR').format(n);
+const fecha = (d: string) =>
+  new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${d}T12:00:00`));
+const anio = (d: string) => d.slice(0, 4);
+
+const CANCION = {
+  preview:
+    'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/54/3d/ef543d55-58cb-320e-8dc7-084336d961d0/mzaf_15679467696516524072.plus.aac.p.m4a',
+  tapa: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e6/8a/68/e68a688e-129e-cb9d-938f-bc3ee37059ae/075679930910.jpg/300x300bb.jpg',
+  url: 'https://music.apple.com/us/album/see-you-again-feat-charlie-puth/966411595?i=966411602',
+};
+
+/* Callout anchors, as fractions of the profile plate. */
+const LLAMADAS = [
+  { n: 1, x: 0.13, y: 0.40, titulo: '1.6 TiVCT nafta', pie: 'Como figura en las facturas de Dietrich' },
+  { n: 2, x: 0.36, y: 0.31, titulo: 'Caja manual de 5', pie: 'Sin embrague desde octubre de 2025' },
+  { n: 3, x: 0.55, y: 0.45, titulo: '5 puertas', pie: 'Carrocería Kinetic Design, versión Titanium' },
+  { n: 4, x: 0.13, y: 0.76, titulo: 'Llantas de aleación 16"', pie: 'Cubiertas 195/50 R16' },
+  { n: 5, x: 0.9, y: 0.32, titulo: 'Portón trasero', pie: 'Parabrisas delantero cambiado en 2025' },
+];
+
+const VOLUMEN = 0.5;
+
+function Musica() {
+  const [sonando, setSonando] = useState(false);
+  const [falla, setFalla] = useState(false);
+  const audio = useRef<HTMLAudioElement>(null);
+
+  // al cargar la página arranca sola, desde el principio y a mitad de volumen.
+  // Si el navegador bloquea el autoplay queda en pausa y el botón sigue andando.
+  useEffect(() => {
+    const el = audio.current;
+    if (!el) return;
+    el.volume = VOLUMEN;
+    el.currentTime = 0;
+    el.play().then(
+      () => setSonando(true),
+      () => setSonando(false),
+    );
+  }, []);
+
+  const alternar = () => {
+    const el = audio.current;
+    if (!el || falla) return;
+    if (sonando) {
+      el.pause();
+      setSonando(false);
+    } else {
+      el.volume = VOLUMEN;
+      el.currentTime = 0;
+      el.play().then(
+        () => setSonando(true),
+        () => { setSonando(false); setFalla(true); },
+      );
+    }
+  };
+
+  return (
+    <div className={`musica${sonando ? ' sonando' : ''}`}>
+      <audio
+        ref={audio}
+        src={CANCION.preview}
+        preload="auto"
+        onEnded={() => setSonando(false)}
+        onLoadedMetadata={(e) => { e.currentTarget.volume = VOLUMEN; }}
+        onError={() => { setSonando(false); setFalla(true); }}
+      />
+      <button
+        onClick={alternar}
+        disabled={falla}
+        aria-pressed={sonando}
+        aria-label={falla ? 'No se pudo cargar la canción' : sonando ? 'Pausar See You Again' : 'Reproducir See You Again'}
+      >
+        {sonando ? <Pause size={13} /> : <Play size={13} />}
+      </button>
+      <Image className="disco" src={CANCION.tapa} alt="" width={26} height={26} />
+      <a href={CANCION.url} target="_blank" rel="noreferrer">See You Again</a>
+    </div>
+  );
 }
 
-function Empty({children}:{children:React.ReactNode}) { return <div className="empty"><div className="empty-icon"><Disc3 size={25}/></div><p>{children}</p></div>; }
+function Giro({ cuadros }: { cuadros: Cuadro[] }) {
+  const [i, setI] = useState(0);
+  const arrastre = useRef<{ x: number; desde: number } | null>(null);
+  const total = cuadros.length;
 
-export default function HarrisonExperience({services,current,details,records}:{services:Service[];current:Asset[];details:Asset[];records:Asset[]}) {
-  const [open,setOpen]=useState<string|null>(null); const [selectedPhoto,setSelectedPhoto]=useState<Asset|null>(null);
-  const [hoveredPoint,setHoveredPoint]=useState<{date:string;y:number;left:number;top:number}|null>(null);
-  const ordered=[...services].reverse(); const linked=(date:string)=>records.filter(a=>a.date===date);
-  const points=useMemo(()=>services.filter(s=>s.mileage).map(s=>({x:new Date(s.date).getTime(),y:s.mileage!,date:s.date})),[services]);
-  const min=Math.min(...points.map(p=>p.y)), max=Math.max(...points.map(p=>p.y)); const chartW=900, chartH=300, pad=42;
-  const pathD=points.map((p,i)=>`${i?'L':'M'} ${pad+(p.x-points[0].x)/(points.at(-1)!.x-points[0].x)*(chartW-pad*2)} ${chartH-pad-(p.y-min)/(max-min)*(chartH-pad*2)}`).join(' ');
-  return <main>
-    <header className="header"><a className="wordmark" href="#fotos">HARRISON<span>FIESTA 2012</span></a><nav>{[['fotos','Fotos'],['historial','Historial'],['kilometros','Kilómetros'],['detalles','Detalles'],['contacto','Contacto']].map(([id,l])=><a key={id} href={`#${id}`}>{l}</a>)}</nav><MusicControl/></header>
-    <section id="fotos" className="hero"><div className="hero-bg">{current[0]&&<Image src={current[0].src} alt="Ford Fiesta 2012" fill priority sizes="100vw"/>}<div className="hero-shade"/></div><div className="hero-content"><p className="eyebrow">UNA HISTORIA SOBRE RUEDAS · 2012</p><h1>Ford Fiesta<br/><em>Harrison.</em></h1><p className="hero-lede">Una unidad con historia documentada, mantenida con cuidado y lista para su próxima etapa.</p>{current.length===0&&<p className="hero-photo-note">Las fotos reales aparecerán acá al agregarlas en <code>public/car/current/</code>.</p>}<div className="hero-actions"><a className="button button-primary" href="#contacto">Ver precio <ArrowDown size={16}/></a><a className="button button-ghost" href="#historial">Conocer la historia <ArrowDown size={16}/></a></div>{current.length>1&&<div className="hero-gallery" aria-label="Fotos actuales">{current.slice(0,5).map(a=><button key={a.name} onClick={()=>setSelectedPhoto(a)} aria-label={`Ampliar ${a.label}`}><Image src={a.src} alt="" width={84} height={58}/></button>)}</div>}</div><div className="hero-meta"><span>ÚLTIMO REGISTRO</span><strong>91.000 <small>KM</small></strong></div></section>
-    <section className="intro-band"><p>La confianza se construye con evidencia.</p><span>01 / 04</span></section>
-    <section id="historial" className="history section"><div className="section-heading"><p className="eyebrow">02 — HISTORIAL</p><h2>Lo que pasó,<br/><em>queda registrado.</em></h2><p>Un recorrido cronológico por servicios, reparaciones y mejoras. Abrí cada fecha para ver la información completa y sus comprobantes.</p></div><div className="history-grid"><div className="timeline">{ordered.map(s=><article className={`timeline-item ${open===s.id?'is-open':''}`} key={s.id}><div className="timeline-dot"/><button className="timeline-card" onClick={()=>setOpen(open===s.id?null:s.id)} aria-expanded={open===s.id} aria-controls={`detail-${s.id}`}><span className="timeline-date">{fmtDate(s.date)} · {s.workshop}</span><span className="timeline-title">{s.category}</span><span className="timeline-summary">{s.summary}</span><span className="timeline-meta">{s.mileage?`${fmtKm(s.mileage)} km${s.mileageAnomaly?' · lectura original':''}`:'Kilometraje no consignado'} <ChevronDown size={16}/></span></button>{open===s.id&&<div className="timeline-detail" id={`detail-${s.id}`}><p>{s.notes}</p>{linked(s.date).length>0?<div className="receipts">{linked(s.date).map(a=>a.isPdf?<a key={a.name} href={a.src} target="_blank" rel="noreferrer" className="receipt">{a.label} <ArrowUpRight size={14}/></a>:<button key={a.name} className="receipt receipt-image" onClick={()=>setSelectedPhoto(a)}><Image src={a.src} alt={a.label} width={160} height={110}/><span>{a.label}</span></button>)}</div>:<small className="muted">No hay comprobantes adjuntos para esta fecha todavía.</small>}</div>}</article>)}</div><aside className="polaroids"><p className="eyebrow">FRAGMENTOS</p>{current.slice(0,4).map((a,i)=><figure className={`polaroid p${i}`} key={a.name}><div>{<Image src={a.src} alt={a.label||'Foto del auto'} width={240} height={180}/>}</div><figcaption>{a.label||'Harrison · archivo personal'}</figcaption></figure>)}{current.length===0&&<Empty>Las fotos del auto aparecerán aquí cuando agregues archivos a <code>public/car/current/</code>.</Empty>}</aside></div></section>
-    <section id="kilometros" className="mileage section"><div className="section-heading split"><div><p className="eyebrow">03 — KILÓMETROS</p><h2>La distancia<br/><em>también cuenta.</em></h2></div><div className="latest"><small>ÚLTIMO REGISTRO</small><strong>91.000 <i>km</i></strong></div></div><div className="chart-wrap">{points.length?<svg viewBox={`0 0 ${chartW} ${chartH}`} role="img" aria-label="Kilómetros registrados a través del tiempo" preserveAspectRatio="none"><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#2276d2" stopOpacity=".25"/><stop offset="1" stopColor="#2276d2" stopOpacity="0"/></linearGradient></defs><path d={`${pathD} L ${chartW-pad} ${chartH-pad} L ${pad} ${chartH-pad} Z`} fill="url(#fill)"/><path d={pathD} fill="none" stroke="#2276d2" strokeWidth="3" strokeLinecap="round"/>{points.map((p,i)=>{const cx=pad+(p.x-points[0].x)/(points.at(-1)!.x-points[0].x)*(chartW-pad*2);const cy=chartH-pad-(p.y-min)/(max-min)*(chartH-pad*2);return <circle key={`${p.date}-${i}`} cx={cx} cy={cy} r="6" fill="#fff" stroke="#2276d2" strokeWidth="3" tabIndex={0} role="button" aria-label={`${fmtDate(p.date)}: ${fmtKm(p.y)} kilómetros`} onMouseEnter={()=>setHoveredPoint({date:p.date,y:p.y,left:cx/chartW*100,top:cy/chartH*100})} onMouseLeave={()=>setHoveredPoint(null)} onFocus={()=>setHoveredPoint({date:p.date,y:p.y,left:cx/chartW*100,top:cy/chartH*100})} onBlur={()=>setHoveredPoint(null)}/>})}</svg>:<Empty>Aún no hay lecturas de kilometraje.</Empty>}{hoveredPoint&&<div className="chart-tooltip" style={{left:`${hoveredPoint.left}%`,top:`${hoveredPoint.top}%`}}><strong>{fmtKm(hoveredPoint.y)} km</strong><span>{fmtDate(hoveredPoint.date)}</span></div>}<div className="chart-axis"><span>{fmtDate(points[0]?.date||'2013-01-01')}</span><span>{fmtDate(points.at(-1)?.date||'2026-01-01')}</span></div></div></section>
-    <section id="detalles" className="details section"><div className="section-heading"><p className="eyebrow">04 — DETALLES</p><h2>Las marcas<br/><em>también cuentan.</em></h2><p>Un archivo visual de los detalles estéticos de la unidad. Transparencia para mirar de cerca.</p></div>{details.length?<div className="details-grid">{details.map(a=><button key={a.name} onClick={()=>setSelectedPhoto(a)}><Image src={a.src} alt={a.label} width={500} height={380}/><span>{a.label}</span></button>)}</div>:<Empty>Agregá imágenes a <code>public/car/details/</code> para mostrar aquí los detalles estéticos.</Empty>}</section>
-    <section id="contacto" className="contact section"><div><p className="eyebrow">HARRISON · FIESTA 2012</p><h2>Tu próxima<br/><em>historia empieza acá.</em></h2></div><div className="price"><small>PRECIO</small><strong>USD 10.000</strong><span>91.000 km · Año 2012</span><a className="button button-primary" href="mailto:nicozuzek@gmail.com?subject=Consulta%20Ford%20Fiesta%202012"><Mail size={17}/> Escribirme</a></div><p className="contact-note">¿Querés conocerlo? Escribime y coordinamos.</p></section>
-    <footer><span>HARRISON / FIESTA 2012</span><span>Una presentación personal · No afiliado a Ford Motor Company</span></footer>
-    {selectedPhoto&&<div className="lightbox" role="dialog" aria-modal="true" aria-label={selectedPhoto.label} onClick={()=>setSelectedPhoto(null)}><div onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setSelectedPhoto(null)} aria-label="Cerrar">×</button>{selectedPhoto.isPdf?<iframe src={selectedPhoto.src} title={selectedPhoto.label}/>:<Image src={selectedPhoto.src} alt={selectedPhoto.label} width={1000} height={800}/>}<p>{selectedPhoto.label}</p></div></div>}
-  </main>;
+  useEffect(() => {
+    const up = () => { arrastre.current = null; };
+    const move = (e: PointerEvent) => {
+      const a = arrastre.current;
+      if (!a) return;
+      // media pantalla de recorrido = una vuelta entera
+      const paso = Math.round(((e.clientX - a.x) / (window.innerWidth * 0.5)) * total);
+      setI((((a.desde + paso) % total) + total) % total);
+    };
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    window.addEventListener('pointermove', move);
+    return () => {
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      window.removeEventListener('pointermove', move);
+    };
+  }, [total]);
+
+  return (
+    <div className="giro">
+      <div
+        className="giro-escena"
+        onPointerDown={(e) => { arrastre.current = { x: e.clientX, desde: i }; }}
+        role="group"
+        aria-label={`Vista giratoria del auto, cuadro ${i + 1} de ${total}`}
+      >
+        {cuadros.map((c, n) => (
+          <Image
+            key={c.file}
+            className={n === i ? 'visible' : undefined}
+            src={`/car/giro/${c.file}`}
+            alt={n === i ? `${c.label}. Cuadro ${n + 1} de ${total}.` : ''}
+            width={c.w}
+            height={c.h}
+            loading="eager"
+            sizes="(max-width: 860px) 100vw, 1200px"
+            draggable={false}
+          />
+        ))}
+      </div>
+      <div className="giro-pista">
+        <button onClick={() => setI((i + 1) % cuadros.length)} aria-label="Girar un cuadro">
+          <RotateCw size={15} />
+        </button>
+        <input
+          type="range"
+          min={0}
+          max={total - 1}
+          value={i}
+          onChange={(e) => setI(+e.target.value)}
+          aria-label="Girar el auto"
+        />
+        <span className="giro-cuenta dato">{i + 1} / {total}</span>
+      </div>
+    </div>
+  );
+}
+
+function Escaneado({ escaneo, alt }: { escaneo: Escaneo; alt: string }) {
+  return (
+    <div className="escaneo">
+      <Image src={escaneo.src} alt={alt} width={escaneo.w} height={escaneo.h} sizes="(max-width: 860px) 60vw, 700px" />
+      {escaneo.highlights.map((h, i) => (
+        <span
+          key={i}
+          className="resalte"
+          style={{ left: `${h.x * 100}%`, top: `${h.y * 100}%`, width: `${h.w * 100}%`, height: `${h.h * 100}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+type Vista =
+  | { tipo: 'foto'; lista: Foto[]; i: number; carpeta: string }
+  | { tipo: 'escaneo'; lista: Escaneo[]; i: number; pie: string };
+
+function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mover: (d: number) => void }) {
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') cerrar();
+      if (e.key === 'ArrowRight') mover(1);
+      if (e.key === 'ArrowLeft') mover(-1);
+    };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, [vista, cerrar, mover]);
+
+  const actual = vista.lista[vista.i];
+  const pie =
+    vista.tipo === 'foto'
+      ? (actual as Foto).label
+      : [vista.pie, (actual as Escaneo).label].filter(Boolean).join(' · ');
+  const varias = vista.lista.length > 1;
+
+  return (
+    <div className="visor" role="dialog" aria-modal="true" aria-label={pie} onClick={cerrar}>
+      <figure className="visor-marco" onClick={(e) => e.stopPropagation()}>
+        <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
+        {vista.tipo === 'foto' ? (
+          <Image
+            src={`/car/${vista.carpeta}/${(actual as Foto).file}`}
+            alt={(actual as Foto).label}
+            width={actual.w}
+            height={actual.h}
+            sizes="100vw"
+          />
+        ) : (
+          <Escaneado escaneo={actual as Escaneo} alt={pie} />
+        )}
+        {varias && (
+          <>
+            <button className="visor-nav prev" onClick={() => mover(-1)} aria-label="Anterior"><ChevronLeft size={22} /></button>
+            <button className="visor-nav sig" onClick={() => mover(1)} aria-label="Siguiente"><ChevronRight size={22} /></button>
+          </>
+        )}
+        <figcaption>
+          {pie}
+          {varias && <span className="visor-cuenta dato"> {vista.i + 1} / {vista.lista.length}</span>}
+        </figcaption>
+      </figure>
+    </div>
+  );
+}
+
+const ANCHO = 1000;
+const ALTO = 420;
+const PAD = { izq: 76, der: 26, arr: 28, aba: 64 };
+
+export default function Pagina({
+  vehiculo,
+  fotos,
+  giro,
+  detalles,
+  cochera,
+  services,
+}: {
+  vehiculo: Vehiculo;
+  fotos: Foto[];
+  giro: Cuadro[];
+  detalles: Foto[];
+  cochera: Cochera[];
+  services: Servicio[];
+}) {
+  const [vista, setVista] = useState<Vista | null>(null);
+  const [activo, setActivo] = useState<string | null>(null);
+  const [fijo, setFijo] = useState(false);
+  const [dibujado, setDibujado] = useState(false);
+  const caja = useRef<HTMLDivElement>(null);
+
+  const conKm = useMemo(() => services.filter((s) => s.mileage), [services]);
+  const sinKm = useMemo(() => services.filter((s) => !s.mileage), [services]);
+
+  const { puntos, ejeX, ejeY, tramos, base, ultimo, marcadores, marcasEstimadas, compra } = useMemo(() => {
+    const t = (f: string) => new Date(`${f}T12:00:00`).getTime();
+    const odo = { fecha: vehiculo.odometroFecha, km: vehiculo.odometro };
+    const crudos = [
+      ...conKm.map((s) => ({ id: s.id, fecha: s.date, km: s.mileage!, servicio: s })),
+      { id: 'odometro', fecha: odo.fecha, km: odo.km, servicio: null as Servicio | null },
+    ];
+    const t0 = t(crudos[0].fecha);
+    const t1 = t(crudos[crudos.length - 1].fecha);
+    const kmMax = Math.ceil(Math.max(...crudos.map((p) => p.km)) / 20000) * 20000;
+    const px = (f: string) => PAD.izq + ((t(f) - t0) / (t1 - t0)) * (ANCHO - PAD.izq - PAD.der);
+    const py = (k: number) => ALTO - PAD.aba - (k / kmMax) * (ALTO - PAD.arr - PAD.aba);
+    const puntos = crudos.map((p) => ({ ...p, cx: px(p.fecha), cy: py(p.km) }));
+
+    const base = ALTO - PAD.aba;
+    const linea = (pts: { cx: number; cy: number }[]) =>
+      pts.map((p, i) => `${i ? 'L' : 'M'} ${p.cx.toFixed(1)} ${p.cy.toFixed(1)}`).join(' ');
+    const areaDe = (pts: { cx: number; cy: number }[]) =>
+      `${linea(pts)} L ${pts[pts.length - 1].cx.toFixed(1)} ${base} L ${pts[0].cx.toFixed(1)} ${base} Z`;
+
+    // km leído sobre la recta que une los dos registros que rodean esa fecha
+    const kmEnFecha = (f: string) => {
+      const x = t(f);
+      for (let i = 1; i < crudos.length; i++) {
+        const a = crudos[i - 1], b = crudos[i];
+        if (x <= t(b.fecha)) {
+          const r = (x - t(a.fecha)) / (t(b.fecha) - t(a.fecha));
+          return a.km + r * (b.km - a.km);
+        }
+      }
+      return crudos[crudos.length - 1].km;
+    };
+
+    const estimados = sinKm.map((s) => {
+      const km = kmEnFecha(s.date);
+      return { s, km, cx: px(s.date), cy: py(km) };
+    });
+
+    // fecha aproximada en la que el odómetro cruzó los km de compra
+    const fechaEnKm = (k: number) => {
+      for (let i = 1; i < crudos.length; i++) {
+        const a = crudos[i - 1], b = crudos[i];
+        if (k <= b.km) {
+          const r = (k - a.km) / (b.km - a.km);
+          return t(a.fecha) + r * (t(b.fecha) - t(a.fecha));
+        }
+      }
+      return t1;
+    };
+    const kmCompra = vehiculo.compraKm;
+    const compra = kmCompra
+      ? {
+          km: kmCompra,
+          cx: PAD.izq + ((fechaEnKm(kmCompra) - t0) / (t1 - t0)) * (ANCHO - PAD.izq - PAD.der),
+          cy: py(kmCompra),
+        }
+      : null;
+
+    // dos tramos: hasta la compra y desde la compra
+    let tramos: { d: string; area: string; x0: number; x1: number }[];
+    if (compra) {
+      const corte = puntos.findIndex((p) => p.cx >= compra.cx);
+      const antes = [...puntos.slice(0, Math.max(corte, 1)), compra];
+      const despues = [compra, ...puntos.slice(Math.max(corte, 1))];
+      tramos = [
+        { d: linea(antes), area: areaDe(antes), x0: antes[0].cx, x1: compra.cx },
+        { d: linea(despues), area: areaDe(despues), x0: compra.cx, x1: despues[despues.length - 1].cx },
+      ];
+    } else {
+      tramos = [{ d: linea(puntos), area: areaDe(puntos), x0: puntos[0].cx, x1: puntos[puntos.length - 1].cx }];
+    }
+
+    const anios: { a: string; x: number }[] = [];
+    for (let a = 2013; a <= 2026; a += 2) {
+      const x = px(`${a}-01-01`);
+      if (x >= PAD.izq - 4 && x <= ANCHO - PAD.der) anios.push({ a: String(a), x });
+    }
+    const ejeY: { k: number; y: number }[] = [];
+    for (let k = 0; k <= kmMax; k += 20000) ejeY.push({ k, y: py(k) });
+
+    // dos registros con fechas y km casi iguales quedan uno encima del otro: se agrupan en un marcador
+    const agrupar = <T extends { cx: number; cy: number }>(items: T[], tope: number) => {
+      const grupos: T[][] = [];
+      for (const it of items) {
+        const ultimo = grupos[grupos.length - 1];
+        const ref = ultimo?.[ultimo.length - 1];
+        if (ref && Math.hypot(it.cx - ref.cx, it.cy - ref.cy) <= tope) ultimo.push(it);
+        else grupos.push([it]);
+      }
+      return grupos;
+    };
+
+    // radio de click: la mitad de la distancia al marcador más cercano, para que nunca se solapen
+    const conRadio = <T extends { cx: number; cy: number }>(ms: T[]) =>
+      ms.map((m) => {
+        const cerca = ms.reduce((min, o) => (o === m ? min : Math.min(min, Math.hypot(o.cx - m.cx, o.cy - m.cy))), Infinity);
+        return { ...m, r: Math.max(7, Math.min(16, cerca / 2)) };
+      });
+
+    const marcadores = conRadio(
+      agrupar(puntos, 6.5).map((g) => ({
+        id: g.map((p) => p.id).join('+'),
+        cx: g.reduce((a, p) => a + p.cx, 0) / g.length,
+        cy: g.reduce((a, p) => a + p.cy, 0) / g.length,
+        entradas: g.map((p) => ({ servicio: p.servicio, km: p.km, fecha: p.fecha })),
+        odometro: g.some((p) => p.id === 'odometro'),
+      })),
+    );
+
+    const marcasEstimadas = conRadio(
+      agrupar(estimados, 6.5).map((g) => ({
+        id: g.map((e) => e.s.id).join('+'),
+        cx: g.reduce((a, e) => a + e.cx, 0) / g.length,
+        cy: g.reduce((a, e) => a + e.cy, 0) / g.length,
+        entradas: g.map((e) => ({ servicio: e.s, km: e.km, fecha: e.s.date, estimado: true })),
+        odometro: false,
+      })),
+    );
+
+    return { puntos, ejeX: anios, ejeY, tramos, base, ultimo: puntos[puntos.length - 1], marcadores, marcasEstimadas, compra };
+  }, [conKm, sinKm, vehiculo.odometro, vehiculo.odometroFecha, vehiculo.compraKm]);
+
+  useEffect(() => {
+    if (!caja.current) return;
+    for (const el of caja.current.querySelectorAll<SVGPathElement>('.trazo.dibujar'))
+      el.style.setProperty('--largo', String(el.getTotalLength()));
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setDibujado(true); obs.disconnect(); } },
+      { threshold: 0.3 },
+    );
+    obs.observe(caja.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const marcadorActivo = useMemo(
+    () => [...marcadores, ...marcasEstimadas].find((m) => m.id === activo) ?? null,
+    [activo, marcadores, marcasEstimadas],
+  );
+
+  const cerrarGlobo = useCallback(() => { setActivo(null); setFijo(false); }, []);
+
+  useEffect(() => {
+    if (!fijo) return;
+    const tecla = (e: KeyboardEvent) => { if (e.key === 'Escape') cerrarGlobo(); };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, [fijo, cerrarGlobo]);
+
+  const mover = useCallback((delta: number) => {
+    setVista((v) => (v ? { ...v, i: (v.i + delta + v.lista.length) % v.lista.length } : v));
+  }, []);
+
+  const abrirEscaneo = (s: Servicio, i = 0) =>
+    s.scans && setVista({ tipo: 'escaneo', lista: s.scans, i, pie: `${s.workshop} · ${fecha(s.date)}` });
+
+  return (
+    <>
+      <header className="header">
+        <a className="marca" href="#portada">
+          <Image src="/brand/ford.png" alt="Ford" width={1000} height={360} />
+          <strong>HARRISON</strong>
+        </a>
+        <nav>
+          <a href="#fotos">Fotos</a>
+          <a href="#ficha">Ficha</a>
+          <a href="#historial">Historial</a>
+          <a href="#detalles">Detalles</a>
+          <a href="#cochera">Cochera</a>
+          <a href="#precio">Precio</a>
+        </nav>
+        <Musica />
+      </header>
+
+      <main>
+        <section id="portada" className="portada">
+          {fotos[0] && (
+            <Image
+              src={`/car/fotos/${fotos[0].file}`}
+              alt="Ford Fiesta 2012 de perfil, tres cuartos delantero"
+              width={fotos[0].w}
+              height={fotos[0].h}
+              loading="eager"
+              fetchPriority="high"
+              sizes="100vw"
+            />
+          )}
+          <div className="portada-cuerpo">
+            <h1 className="nombre">{vehiculo.nombre}</h1>
+            <Image className="portada-fiesta" src="/brand/fiesta.png" alt="Fiesta" width={539} height={134} />
+            <div className="ficha-tira dato">
+              <div><span>Año</span><strong>{vehiculo.anio}</strong></div>
+              <div><span>Odómetro</span><strong>{km(vehiculo.odometro)} <em>km</em></strong></div>
+              <div><span>Registros de service</span><strong>{services.length}</strong></div>
+              <div><span>Precio</span><strong>USD {usd(vehiculo.precioUsd)}</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="fotos" className="seccion fotos">
+          <div className="seccion-intro">
+            <h2>El auto, hoy</h2>
+            <p>Fotos del {fecha('2026-09-13')}, sin retoque. Arrastrá para dar la vuelta al auto.</p>
+          </div>
+          {giro.length > 0 && <Giro cuadros={giro} />}
+          <div className="rejilla">
+            {fotos.map((f, i) => (
+              <button
+                key={f.file}
+                onClick={() => setVista({ tipo: 'foto', lista: fotos, i, carpeta: 'fotos' })}
+                aria-label={`Ampliar: ${f.label}`}
+              >
+                <Image src={`/car/fotos/${f.file}`} alt={f.label} width={f.w} height={f.h} sizes="(max-width: 860px) 92vw, 400px" />
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section id="ficha" className="seccion">
+          <div className="seccion-intro">
+            <h2>Qué es exactamente</h2>
+            <p>
+              {vehiculo.modelo}, {vehiculo.anio}. Los datos salen de las facturas del concesionario, no de un aviso.
+            </p>
+          </div>
+          <div className="placa">
+            <Image src="/brand/perfil.jpg" alt="Perfil izquierdo del Ford Fiesta" width={1700} height={816} sizes="100vw" />
+            {LLAMADAS.map((l) => (
+              <span key={l.n} className="llamada dato" style={{ left: `${l.x * 100}%`, top: `${l.y * 100}%` }} aria-hidden="true">
+                {l.n}
+              </span>
+            ))}
+          </div>
+          <ul className="claves">
+            {LLAMADAS.map((l) => (
+              <li key={l.n}>
+                <b className="dato">{l.n}</b>
+                <span><strong>{l.titulo}</strong><small>{l.pie}</small></span>
+              </li>
+            ))}
+            <li>
+              <b className="dato">6</b>
+              <span><strong>{km(vehiculo.odometro)} km</strong><small>Odómetro al {fecha(vehiculo.odometroFecha)}</small></span>
+            </li>
+          </ul>
+        </section>
+
+        <section id="historial" className="seccion historial">
+          <div className="seccion-intro">
+            <h2>Service y kilómetros</h2>
+          </div>
+
+          <div className="grafico-caja">
+            <div className="grafico-lienzo" ref={caja}>
+            <svg className="grafico" viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img"
+              aria-label={`Kilometraje registrado entre ${anio(services[0].date)} y ${anio(vehiculo.odometroFecha)}, de ${km(conKm[0].mileage!)} a ${km(vehiculo.odometro)} kilómetros. El detalle completo está en la tabla que sigue.`}>
+              <defs>
+                <linearGradient id="degradado" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#7cc7f0" stopOpacity="0.2" />
+                  <stop offset="1" stopColor="#7cc7f0" stopOpacity="0" />
+                </linearGradient>
+                <linearGradient id="degradadoGris" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#8b9599" stopOpacity="0.16" />
+                  <stop offset="1" stopColor="#8b9599" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+
+              {ejeY.map((g) => (
+                <g key={g.k}>
+                  <line className="eje-linea" x1={PAD.izq} y1={g.y} x2={ANCHO - PAD.der} y2={g.y} />
+                  <text className="eje-texto" x={PAD.izq - 12} y={g.y + 4} textAnchor="end">{km(g.k)}</text>
+                </g>
+              ))}
+              {ejeX.map((g) => (
+                <text key={g.a} className="eje-texto" x={g.x} y={ALTO - PAD.aba + 22} textAnchor="middle">{g.a}</text>
+              ))}
+
+              {tramos.map((tr, i) => (
+                <path
+                  key={`area-${i}`}
+                  className={`relleno${dibujado ? ' visible' : ''}`}
+                  d={tr.area}
+                  fill={`url(#${i === 0 && tramos.length > 1 ? 'degradadoGris' : 'degradado'})`}
+                />
+              ))}
+              {tramos.map((tr, i) => (
+                <path
+                  key={`linea-${i}`}
+                  className={`trazo dibujar tramo-${i}${i === 0 && tramos.length > 1 ? ' previo' : ''}${dibujado ? ' visible' : ''}`}
+                  d={tr.d}
+                />
+              ))}
+              {compra && <line className="corte" x1={compra.cx} y1={compra.cy} x2={compra.cx} y2={base} />}
+              {tramos.length > 1 && (
+                <>
+                  <text className="tramo-nota previo" x={(tramos[0].x0 + tramos[0].x1) / 2} y={base - 16} textAnchor="middle">
+                    Dueño anterior, hasta ~{km(compra!.km)} km
+                  </text>
+                  <text className="tramo-nota" x={(tramos[1].x0 + tramos[1].x1) / 2} y={base - 16} textAnchor="middle">
+                    Desde que lo compré
+                  </text>
+                </>
+              )}
+
+              {marcasEstimadas.map((m) => (
+                <g
+                  key={m.id}
+                  className={`estimado${activo === m.id ? ' activo' : ''}`}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${m.entradas.map((e) => `${fecha(e.fecha)}, ${e.servicio!.workshop}`).join('; ')}. Sin kilometraje anotado, estimado ${km(Math.round(m.entradas[0].km))} kilómetros.`}
+                  onMouseEnter={() => !fijo && setActivo(m.id)}
+                  onMouseLeave={() => !fijo && setActivo(null)}
+                  onFocus={() => setActivo(m.id)}
+                  onClick={() => { setActivo(m.id); setFijo(true); }}
+                >
+                  <line className="estimado-tallo" x1={m.cx} y1={base} x2={m.cx} y2={m.cy} />
+                  <circle className="estimado-punto" cx={m.cx} cy={m.cy} r={m.entradas.length > 1 ? 6 : 4.5} />
+                  {m.entradas.length > 1 && <circle className="estimado-anillo" cx={m.cx} cy={m.cy} r="9.5" />}
+                  <rect x={m.cx - m.r} y={m.cy - 10} width={m.r * 2} height={base - m.cy + 18} fill="transparent" />
+                </g>
+              ))}
+
+              <text className="rail-nota" x={PAD.izq} y={ALTO - 12}>
+                Líneas punteadas: {sinKm.length} registros sin kilometraje anotado, estimado sobre la curva
+              </text>
+
+              {marcadores.map((m) => (
+                <g
+                  key={m.id}
+                  className={`punto${m.odometro ? ' punto-odometro' : ''}${compra && m.cx < compra.cx ? ' previo' : ''}${activo === m.id ? ' activo' : ''}`}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={m.entradas
+                    .map((e) =>
+                      e.servicio
+                        ? `${fecha(e.fecha)}, ${e.servicio.workshop}, ${km(e.km)} kilómetros`
+                        : `Odómetro actual, ${fecha(e.fecha)}, ${km(e.km)} kilómetros`,
+                    )
+                    .join('; ')}
+                  onMouseEnter={() => !fijo && setActivo(m.id)}
+                  onMouseLeave={() => !fijo && setActivo(null)}
+                  onFocus={() => setActivo(m.id)}
+                  onClick={() => { setActivo(m.id); setFijo(true); }}
+                >
+                  <circle className="halo" cx={m.cx} cy={m.cy} r={m.r} />
+                  <circle className="nucleo" cx={m.cx} cy={m.cy} r="6" />
+                  {m.entradas.length > 1 && <circle className="anillo" cx={m.cx} cy={m.cy} r="10" />}
+                </g>
+              ))}
+
+              <text className="eje-texto" x={ultimo.cx} y={ultimo.cy - 18} textAnchor="end" fill="#7cc7f0">
+                {km(vehiculo.odometro)} km
+              </text>
+            </svg>
+
+            {marcadorActivo && (
+              <Globo
+                marcador={marcadorActivo}
+                vehiculo={vehiculo}
+                fijo={fijo}
+                cerrar={cerrarGlobo}
+                ampliar={abrirEscaneo}
+              />
+            )}
+            </div>
+          </div>
+
+          <div className="registros">
+            <div className="registros-scroll">
+            <table>
+              <caption className="visually-hidden" style={{ textAlign: 'left', paddingBottom: '1rem', fontSize: '0.78rem', color: '#7d8481' }}>
+                Los {services.length} registros, del más viejo al más nuevo.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Lugar</th>
+                  <th scope="col" className="col-km">Km</th>
+                  <th scope="col" className="col-obs">Trabajo</th>
+                  <th scope="col">Respaldo</th>
+                </tr>
+              </thead>
+              <tbody>
+                {services.map((s) => (
+                  <tr key={s.id}>
+                    <td className="dato">{fecha(s.date)}</td>
+                    <td>{s.workshop}</td>
+                    <td className="col-km dato">{s.mileage ? km(s.mileage) : '—'}</td>
+                    <td className="col-obs">{s.notes}</td>
+                    <td>
+                      {s.scans ? (
+                        <button onClick={() => abrirEscaneo(s)}>
+                          Ver{s.scans.length > 1 ? ` (${s.scans.length})` : ''}
+                        </button>
+                      ) : (
+                        <span style={{ color: '#5d6462' }}>—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="detalles" className="seccion">
+          <div className="seccion-intro">
+            <h2>Detalles</h2>
+            <p>Las marcas que tiene el auto, fotografiadas de cerca. Están todas acá para que no haya sorpresas.</p>
+          </div>
+          {detalles.length ? (
+            <div className="detalles-grid">
+              {detalles.map((f, i) => (
+                <button key={f.file} onClick={() => setVista({ tipo: 'foto', lista: detalles, i, carpeta: 'detalles' })}>
+                  <Image src={`/car/detalles/${f.file}`} alt={f.label} width={f.w} height={f.h} sizes="(max-width: 860px) 90vw, 380px" />
+                  <strong>{f.label}</strong>
+                  {f.nota && <small>{f.nota}</small>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="vacio">Agregá imágenes a public/car/detalles/ para mostrarlas acá.</p>
+          )}
+        </section>
+
+        {cochera.length > 0 && (
+          <section id="cochera" className="seccion cochera">
+            <div className="seccion-intro">
+              <h2>Siempre durmió en cochera</h2>
+              <p>Nunca pasó una noche en la calle.</p>
+            </div>
+            <div className="cochera-grid">
+              {cochera.map((c, i) => (
+                <button
+                  key={c.file}
+                  onClick={() => setVista({ tipo: 'foto', lista: cochera, i, carpeta: 'cochera' })}
+                  aria-label={`Ampliar: ${c.label}`}
+                >
+                  <Image src={`/car/cochera/${c.file}`} alt={c.label} width={c.w} height={c.h} sizes="(max-width: 860px) 92vw, 560px" />
+                  <figcaption>{c.label}</figcaption>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section id="precio" className="seccion precio">
+          <div className="precio-caja">
+            <div className="precio-monto dato">
+              <span>Precio</span>USD {usd(vehiculo.precioUsd)}
+            </div>
+            <div>
+              <p>
+                {vehiculo.modelo} {vehiculo.anio}, {km(vehiculo.odometro)} km, con los {services.length} registros
+                de service que ves más arriba. Escribime y lo vemos.
+              </p>
+              <a className="boton" href={`mailto:${vehiculo.contacto}?subject=${encodeURIComponent('Consulta por el Fiesta 2012')}`}>
+                <Mail size={17} /> Escribirme
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Harrison · Ford Fiesta Kinetic Design 2012</span>
+        <span>Venta particular. Sin relación con Ford Motor Company.</span>
+      </footer>
+
+      {vista && <Visor vista={vista} cerrar={() => setVista(null)} mover={mover} />}
+    </>
+  );
+}
+
+type EntradaGlobo = { servicio: Servicio | null; km: number; fecha: string; estimado?: boolean };
+
+function FilaGlobo({
+  entrada,
+  vehiculo,
+  fijo,
+  ampliar,
+  compacta,
+}: {
+  entrada: EntradaGlobo;
+  vehiculo: Vehiculo;
+  fijo: boolean;
+  ampliar: (s: Servicio) => void;
+  compacta: boolean;
+}) {
+  const { servicio, km: kms, fecha: f, estimado } = entrada;
+  const scans = servicio?.scans ?? [];
+  const escaneo = scans[0];
+  const docs = scans.filter((x) => x.tipo === 'comprobante').length;
+  const fotos = scans.length - docs;
+  const abrirTexto =
+    docs && fotos ? `Ver el comprobante y ${fotos} foto${fotos > 1 ? 's' : ''}`
+    : docs ? (docs > 1 ? `Ver los ${docs} comprobantes` : 'Ver el comprobante entero')
+    : fotos > 1 ? `Ver las ${fotos} fotos del trabajo`
+    : 'Ver la foto del trabajo';
+
+  return (
+    <div className={`globo-fila${compacta ? ' compacta' : ''}`}>
+      {escaneo && <Escaneado escaneo={escaneo} alt="" />}
+      <div className="globo-texto">
+        <div className="globo-fecha dato">{fecha(f)}</div>
+        <div className="globo-taller">{servicio ? servicio.workshop : 'Odómetro hoy'}</div>
+        {estimado ? (
+          <>
+            <strong className="globo-km dato globo-km-estimado">~{km(Math.round(kms / 100) * 100)} km</strong>
+            <div className="globo-sin">Sin kilometraje anotado. Estimado entre los dos registros que lo rodean.</div>
+          </>
+        ) : (
+          <strong className="globo-km dato">{km(kms)} km</strong>
+        )}
+        <p>{servicio ? servicio.notes : `Lectura del tablero, ${fecha(vehiculo.odometroFecha)}.`}</p>
+        {servicio?.contexto && <p className="globo-contexto">{servicio.contexto}</p>}
+        {servicio?.mileageAnomaly && (
+          <p>La planilla registra menos kilómetros que la visita anterior. Se deja como fue anotado.</p>
+        )}
+        {escaneo && fijo && (
+          <button className="globo-ampliar" onClick={() => ampliar(servicio!)}>{abrirTexto}</button>
+        )}
+        {escaneo && !fijo && <div className="globo-sin">Tocá el punto para ampliar</div>}
+        {servicio && !escaneo && <div className="globo-sin">Sin respaldo escaneado</div>}
+      </div>
+    </div>
+  );
+}
+
+function Globo({
+  marcador,
+  vehiculo,
+  fijo,
+  cerrar,
+  ampliar,
+}: {
+  marcador: { cx: number; cy: number; entradas: EntradaGlobo[] };
+  vehiculo: Vehiculo;
+  fijo: boolean;
+  cerrar: () => void;
+  ampliar: (s: Servicio) => void;
+}) {
+  const { cx, cy, entradas } = marcador;
+  const varias = entradas.length > 1;
+  const derecha = cx > ANCHO * 0.58;
+  const abajo = cy < ALTO * 0.42;
+
+  const estilo: React.CSSProperties = {
+    left: `${(cx / ANCHO) * 100}%`,
+    top: `${(cy / ALTO) * 100}%`,
+    transform: `translate(${derecha ? 'calc(-100% - 18px)' : '18px'}, ${abajo ? '0%' : '-100%'})`,
+  };
+
+  return (
+    <div className={`globo${fijo ? ' fijo' : ''}${varias ? ' multiple' : ''}`} style={estilo} role="status">
+      {varias && <div className="globo-encabezado">{entradas.length} visitas casi el mismo día</div>}
+      {entradas.map((e, i) => (
+        <FilaGlobo
+          key={e.servicio?.id ?? `odo-${i}`}
+          entrada={e}
+          vehiculo={vehiculo}
+          fijo={fijo}
+          ampliar={ampliar}
+          compacta={varias}
+        />
+      ))}
+      {fijo && (
+        <button className="visor-cerrar" style={{ top: -14, right: -14, width: 30, height: 30, background: '#16181a' }} onClick={cerrar} aria-label="Cerrar">
+          <X size={15} />
+        </button>
+      )}
+    </div>
+  );
 }

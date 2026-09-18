@@ -9,3 +9,7 @@ dist/
 !.env.example
 
 .vercel
+
+# archivos fuente de fotos, no van al repo
+*.zip
+OneDrive_*/

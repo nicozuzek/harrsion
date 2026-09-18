@@ -1,23 +1,60 @@
-# Harrison · Ford Fiesta 2012
+# Harrison · Ford Fiesta Kinetic 2012
 
-Static, Spanish-language sales page for a 2012 Ford Fiesta. Built with Next.js and deployable to Vercel.
+Página de venta particular, en español, para un Ford Fiesta Kinetic Design Titanium 2012. Next.js, estática, deployable a Vercel.
 
-## Add photos and receipts
+## Estructura de la página
 
-The three folders under `public/car/` are the content manager:
+1. **Portada** — foto a sangre, nombre y los cuatro datos duros (año, odómetro, registros, precio).
+2. **Fotos** — vista giratoria de 7 cuadros (slider o arrastre) y grilla con las 15 fotos restantes. Click abre el visor.
+3. **Ficha** — perfil del auto en blanco y negro con llamadas numeradas, más la lista de datos.
+4. **Historial** — gráfico de kilometraje. Cada punto es un service; al pasar el mouse o tocarlo se abre el respaldo con la fecha y el kilometraje resaltados en amarillo. Los registros sin kilometraje anotado cuelgan de un tallo punteado hasta la curva, con el valor **estimado** por interpolación entre los dos registros que los rodean. Los registros que caen casi en el mismo punto (mismo km y pocos días de diferencia) se agrupan en un solo marcador —con un anillo alrededor— y el popup los lista a los dos; además cada marcador calcula su radio de click para que nunca se pisen. La curva va gris hasta los ~54.000 km con que se compró el auto y celeste desde ahí; el área bajo la curva sigue el mismo corte, con un rótulo por tramo. Debajo, la tabla con los 23 registros.
+5. **Detalles** — primeros planos de las marcas que tiene el auto.
+6. **Cochera** — fotos del auto guardado bajo techo.
+7. **Precio** — USD 9.500 y el mail de contacto.
 
-- `current/`: current sales photos, sorted by filename (`01-frente.jpg`, `02-lateral.jpg`).
-- `records/`: scans and photos named `YYYY-MM-DD--descripcion.ext`. The date joins the matching service record automatically; PDFs appear as links and images in the expanded detail panel.
-- `details/`: close-ups and cosmetic details, sorted by filename. A caption is derived from the text after the numeric prefix.
+## Contenido
 
-Supported image types are `.jpg`, `.jpeg`, `.png`, `.webp`, and `.avif`; records also support `.pdf`. Files appear after committing and deploying.
+Todo el contenido vive en `content/car.json`. No hay CMS ni base de datos.
 
-## Development
+- `vehiculo` — datos del auto, odómetro y precio.
+- `fotos` / `detalles` — archivos en `public/car/fotos/` y `public/car/detalles/`, con `label`, `nota` y dimensiones.
+- `giro` — los cuadros de la vuelta al auto, en `public/car/giro/`, **en orden de giro**. El slider los recorre en ese orden.
+- `cochera` — fotos de las cocheras, en `public/car/cochera/`.
+- `services` — los 23 registros. Cada uno puede tener `scans`, y cada scan lleva sus `highlights`. El campo opcional `contexto` es un párrafo que explica la reparación; aparece sólo en el popup del gráfico.
+- `vehiculo.compraKm` — kilometraje con el que se compró el auto. La fecha de la marca en el gráfico se deduce cruzando ese valor con la curva, no está guardada.
+
+Cada `scan` tiene un `tipo`:
+
+- `comprobante` — el papel del taller, en `public/car/comprobantes/`. Lleva `highlights` sobre la fecha y el kilometraje.
+- `foto` — foto del trabajo hecho, en `public/car/trabajos/`. Lleva `label` (epígrafe) y `highlights: []`.
+
+Dentro de cada registro los documentos van primero; el visor los pagina con las flechas.
+
+### Highlights de los comprobantes
+
+Un `highlight` es un rectángulo en coordenadas normalizadas (0–1) sobre la imagen del comprobante:
+
+```json
+{ "kind": "date", "x": 0.548, "y": 0.079, "w": 0.119, "h": 0.023 }
+```
+
+Se dibuja como un `<span>` amarillo con `mix-blend-mode: multiply`, así que se ve como un resaltador sobre el papel. La imagen original no se toca.
+
+Los archivos de `public/car/comprobantes/` se guardan ya rotados y sin EXIF: el optimizador de imágenes de Next descarta la orientación EXIF, y si el archivo dependiera de ese flag las coordenadas de los highlights caerían en el lugar equivocado.
+
+El contenedor `.escaneo` tiene que medir **exactamente** lo mismo que la imagen: los highlights se posicionan en porcentaje sobre ese contenedor, así que si la imagen queda apaisada dentro de una caja más ancha (por ejemplo con `object-fit: contain`), las marcas se corren y se estiran.
+
+## Desarrollo
 
 ```bash
 npm install
-npm run validate:content
+npm run validate:content   # revisa fechas, ids, km, archivos y rangos de highlights
 npm run dev
+npm run build
 ```
 
-Run `npm run build` before deploying. The source spreadsheet URL and import date are recorded in `content/services.json`; that JSON is the stable, read-only data source used at build time.
+`validate:content` falla si un respaldo apunta a un archivo que no existe, si un highlight se sale de 0–1, si una foto de trabajo no tiene epígrafe, o si el kilometraje baja sin `mileageAnomaly`.
+
+## Datos personales
+
+Los comprobantes de Norauto traen DNI, teléfono y correo del titular. Antes de publicarlos se difumina ese bloque; el nombre queda. Lo mismo con la patente de autos ajenos que aparezcan en las fotos. Si agregás un comprobante nuevo, revisá esto primero.
