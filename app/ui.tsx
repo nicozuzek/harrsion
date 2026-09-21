@@ -56,24 +56,24 @@ const CANCION = {
   url: 'https://music.apple.com/us/album/see-you-again-feat-charlie-puth/966411595?i=966411602',
 };
 
-/* Callout anchors, as fractions of the profile plate. */
-const LLAMADAS = [
-  { n: 1, x: 0.13, y: 0.4, titulo: '1.6 TiVCT nafta', pie: 'Como figura en las facturas de Dietrich' },
-  { n: 2, x: 0.5, y: 0.66, titulo: 'Caja manual de 5', pie: 'Sin embrague desde octubre de 2025' },
-  { n: 3, x: 0.55, y: 0.45, titulo: '5 puertas', pie: 'Carrocería Kinetic Design, versión Titanium' },
-  { n: 4, x: 0.84, y: 0.75, titulo: 'Llantas de aleación 16"', pie: 'Cubiertas 195/50 R16' },
-  { n: 5, x: 0.9, y: 0.32, titulo: 'Portón trasero', pie: 'Parabrisas delantero cambiado en 2025' },
+/* Ficha técnica: la lista de la derecha; dos ítems abren una ventana con detalle. */
+type Ventana = 'airbags' | 'tuercas';
+const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana }[] = [
+  { titulo: 'Motor 1.6' },
+  { titulo: 'Caja manual de 5ta' },
+  { titulo: '7 airbags', ventana: 'airbags' },
+  { titulo: 'Control de estabilidad y ESP' },
+  { titulo: 'Asistente de arranque en pendiente' },
+  { titulo: 'Techo solar eléctrico' },
+  { titulo: 'Luces ambiente en el interior' },
+  { titulo: 'Espejo retrovisor electrocrómico' },
+  { titulo: 'Dirección eléctrica' },
+  { titulo: 'Espejos exteriores con visor de punto ciego' },
+  { titulo: 'Blindaje marca Strong', agregado: true },
+  { titulo: 'Kit luces xenón', agregado: true },
+  { titulo: 'Tuercas de acero macizo', agregado: true, ventana: 'tuercas' },
 ];
-
-const EQUIPO: { n: number; x: number; y: number; titulo: string; pie?: string }[] = [
-  { n: 7, x: 0.68, y: 0.26, titulo: '7 airbags' },
-  { n: 8, x: 0.2, y: 0.77, titulo: 'Control de estabilidad (ESP) y ABS' },
-  { n: 9, x: 0.3, y: 0.71, titulo: 'Asistencia de arranque en pendiente' },
-  { n: 10, x: 0.55, y: 0.09, titulo: 'Techo solar eléctrico' },
-  { n: 11, x: 0.32, y: 0.29, titulo: 'Espejo interior fotocromático' },
-  { n: 12, x: 0.35, y: 0.42, titulo: 'Espejos exteriores con visor de punto ciego' },
-  { n: 13, x: 0.46, y: 0.27, titulo: 'Dirección eléctrica' },
-];
+const NOTAS: Record<string, string> = { 'Kit luces xenón': 'Viene desinstalado' };
 
 const VOLUMEN = 0.5;
 
@@ -245,6 +245,29 @@ function Tarjetas({ lista, carpeta, abrir }: { lista: Foto[]; carpeta: string; a
   );
 }
 
+function Ventana({ titulo, cerrar, children }: { titulo: string; cerrar: () => void; children: React.ReactNode }) {
+  useEffect(() => {
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const tecla = (e: KeyboardEvent) => { if (e.key === 'Escape') cerrar(); };
+    window.addEventListener('keydown', tecla);
+    return () => {
+      document.body.style.overflow = previo;
+      window.removeEventListener('keydown', tecla);
+    };
+  }, [cerrar]);
+
+  return (
+    <div className="visor" role="dialog" aria-modal="true" aria-label={titulo} onClick={cerrar}>
+      <div className="ventana" onClick={(e) => e.stopPropagation()}>
+        <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
+        <h3>{titulo}</h3>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mover: (d: number) => void }) {
   // con el visor abierto la página de atrás no se mueve
   useEffect(() => {
@@ -354,11 +377,13 @@ export default function Pagina({
   const [vista, setVista] = useState<Vista | null>(null);
   const [activo, setActivo] = useState<string | null>(null);
   const [fijo, setFijo] = useState(false);
-  // llamada de la ficha resaltada (hover en escritorio, toque en móvil)
-  const [llamada, setLlamada] = useState<number | null>(null);
-  const [llamadaFija, setLlamadaFija] = useState(false);
-  const claseClave = (n: number) => (llamada == null ? undefined : llamada === n ? 'activa' : 'apagada');
-  const claveActiva = llamada != null ? [...LLAMADAS, ...EQUIPO].find((l) => l.n === llamada) ?? null : null;
+  const [ventana, setVentana] = useState<Ventana | null>(null);
+  const airbags = equipamiento.find((e) => e.lista);
+  const tuercas = mejoras.find((m) => m.historia)?.historia;
+  const abrirVentana = (v: Ventana) => {
+    if (v === 'tuercas' && tuercas) setVista({ tipo: 'historia', lista: tuercas.fotos, i: 0, carpeta: tuercas.carpeta, historia: tuercas });
+    else setVentana(v);
+  };
   const [dibujado, setDibujado] = useState(false);
   const caja = useRef<HTMLDivElement>(null);
 
@@ -523,10 +548,6 @@ export default function Pagina({
   return (
     <>
       <header className="header">
-        <a className="marca" href="#portada">
-          <Image src="/brand/ford.png" alt="Ford" width={1000} height={360} />
-          <strong>HARRISON</strong>
-        </a>
         <nav>
           <a href="#fotos">Fotos</a>
           <a href="#ficha">Ficha</a>
@@ -552,13 +573,16 @@ export default function Pagina({
             />
           )}
           <div className="portada-cuerpo">
-            <h1 className="nombre">{vehiculo.nombre}</h1>
-            <Image className="portada-fiesta" src="/brand/fiesta.png" alt="Fiesta" width={539} height={134} />
+            <h1 className="portada-marcas">
+              <Image className="portada-ford" src="/brand/ford.png" alt="Ford" width={1000} height={360} priority />
+              <Image className="portada-fiesta" src="/brand/fiesta.png" alt="Fiesta" width={539} height={134} priority />
+              <span className="oculto">{vehiculo.nombre}, {vehiculo.modelo} {vehiculo.anio}</span>
+            </h1>
             <div className="ficha-tira dato">
+              <div className="ficha-modelo"><span>Modelo</span><strong>{vehiculo.modelo}</strong></div>
               <div><span>Año</span><strong>{vehiculo.anio}</strong></div>
               <div><span>Odómetro</span><strong>{km(vehiculo.odometro)} <em>km</em></strong></div>
               <div><span>Registros de service</span><strong>{services.length}</strong></div>
-              <div><span>Precio</span><strong>USD {usd(vehiculo.precioUsd)}</strong></div>
             </div>
           </div>
         </section>
@@ -582,65 +606,30 @@ export default function Pagina({
           <div className="seccion-intro">
             <h2>Especificaciones</h2>
           </div>
-          <div className="placa" onMouseLeave={() => !llamadaFija && setLlamada(null)}>
-            <Image src="/brand/perfil.jpg" alt="Perfil izquierdo del Ford Fiesta" width={1700} height={816} sizes="100vw" />
-            {[...LLAMADAS, ...EQUIPO].map((l) => (
-              <button
-                key={l.n}
-                type="button"
-                className={`llamada dato${llamada === l.n ? ' activa' : ''}${llamada != null && llamada !== l.n ? ' apagada' : ''}`}
-                style={{ left: `${l.x * 100}%`, top: `${l.y * 100}%` }}
-                aria-label={l.titulo}
-                aria-pressed={llamadaFija && llamada === l.n}
-                onMouseEnter={() => !llamadaFija && setLlamada(l.n)}
-                onFocus={() => !llamadaFija && setLlamada(l.n)}
-                onBlur={() => !llamadaFija && setLlamada(null)}
-                onClick={() => {
-                  if (llamadaFija && llamada === l.n) { setLlamadaFija(false); setLlamada(null); }
-                  else { setLlamada(l.n); setLlamadaFija(true); }
-                }}
-              >
-                {l.n}
-              </button>
-            ))}
-            <p className="placa-leyenda dato" aria-live="polite">
-              {claveActiva ? <><b>{claveActiva.n}</b> {claveActiva.titulo}</> : 'Pasá por un número para ver qué es'}
-            </p>
+          <div className="ficha">
+            <Image className="ficha-foto" src="/brand/perfil.jpg" alt="Perfil izquierdo del Ford Fiesta" width={1700} height={816} sizes="(max-width: 860px) 100vw, 45vw" />
+            <ul className="especificaciones">
+              {ESPECIFICACIONES.map((e) => {
+                const cuerpo = (
+                  <>
+                    {e.agregado && <small className="agregado dato">Agregado</small>}
+                    <strong>{e.titulo}</strong>
+                    {NOTAS[e.titulo] && <small>{NOTAS[e.titulo]}</small>}
+                    {e.ventana && <span className="ver"><Info size={14} /> Ver detalle</span>}
+                  </>
+                );
+                return (
+                  <li key={e.titulo} className={e.ventana ? 'con-ventana' : undefined}>
+                    {e.ventana ? (
+                      <button type="button" onClick={() => abrirVentana(e.ventana!)} aria-haspopup="dialog">{cuerpo}</button>
+                    ) : (
+                      <div>{cuerpo}</div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-          <ul className="claves">
-            {LLAMADAS.map((l) => (
-              <li key={l.n} className={claseClave(l.n)} onMouseEnter={() => !llamadaFija && setLlamada(l.n)} onMouseLeave={() => !llamadaFija && setLlamada(null)}>
-                <b className="dato">{l.n}</b>
-                <span><strong>{l.titulo}</strong><small>{l.pie}</small></span>
-              </li>
-            ))}
-            <li className={claseClave(6)}>
-              <b className="dato">6</b>
-              <span><strong>{km(vehiculo.odometro)} km</strong><small>Odómetro al {fecha(vehiculo.odometroFecha)}</small></span>
-            </li>
-            {EQUIPO.map((l) => (
-              <li key={l.n} className={claseClave(l.n)} onMouseEnter={() => !llamadaFija && setLlamada(l.n)} onMouseLeave={() => !llamadaFija && setLlamada(null)}>
-                <b className="dato">{l.n}</b>
-                <span><strong>{l.titulo}</strong>{l.pie && <small>{l.pie}</small>}</span>
-              </li>
-            ))}
-          </ul>
-
-          <ul className="equipamiento">
-            {equipamiento.map((e) => (
-              <li key={e.titulo} className={e.lista ? 'ancho' : undefined}>
-                <strong>{e.titulo}</strong>
-                <p>{e.detalle}</p>
-                {e.lista && (
-                  <ol className="airbags dato">
-                    {e.lista.map((a, i) => (
-                      <li key={a}><span>{i + 1}</span>{a}</li>
-                    ))}
-                  </ol>
-                )}
-              </li>
-            ))}
-          </ul>
         </section>
 
         <section id="historial" className="seccion historial">
@@ -817,15 +806,6 @@ export default function Pagina({
           <Tarjetas lista={detalles} carpeta="detalles" abrir={setVista} />
         </section>
 
-        {mejoras.length > 0 && (
-          <section id="mejoras" className="seccion">
-            <div className="seccion-intro">
-              <h2>Mejoras</h2>
-            </div>
-            <Tarjetas lista={mejoras} carpeta="mejoras" abrir={setVista} />
-          </section>
-        )}
-
         {cochera.length > 0 && (
           <section id="cochera" className="seccion cochera">
             <div className="seccion-intro">
@@ -870,6 +850,16 @@ export default function Pagina({
       </footer>
 
       {vista && <Visor vista={vista} cerrar={() => setVista(null)} mover={mover} />}
+      {ventana === 'airbags' && airbags && (
+        <Ventana titulo={airbags.titulo} cerrar={() => setVentana(null)}>
+          <p>{airbags.detalle}</p>
+          <ol className="airbags dato">
+            {airbags.lista!.map((a, i) => (
+              <li key={a}><span>{i + 1}</span>{a}</li>
+            ))}
+          </ol>
+        </Ventana>
+      )}
     </>
   );
 }

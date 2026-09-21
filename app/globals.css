@@ -78,15 +78,6 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   border-bottom: 1px solid var(--linea);
 }
 
-.marca { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; }
-.marca img { width: 44px; height: auto; }
-.marca strong {
-  font-variation-settings: 'wdth' 112;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.02em;
-}
-
 .header nav { display: flex; gap: 1.5rem; margin-left: auto; font-size: 0.82rem; }
 .header nav a { color: var(--grafito); }
 .header nav a:hover { color: var(--asfalto); }
@@ -137,15 +128,16 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 
 .portada-cuerpo { position: relative; z-index: 1; color: #fff; width: 100%; }
 
-.nombre {
-  font-size: clamp(4.2rem, 15vw, 12rem);
-  font-variation-settings: 'wdth' 124;
-  font-weight: 900;
-  line-height: 0.82;
-  margin: 0;
+.portada-marcas {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.2rem, 3vw, 2.6rem);
+  margin: 0 0 2.4rem;
+  line-height: 1;
 }
-
-.portada-fiesta { width: clamp(150px, 22vw, 240px); height: auto; margin: 1.4rem 0 2rem; }
+.portada-ford { width: clamp(96px, 13vw, 190px); height: auto; filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.45)); }
+.portada-fiesta { width: clamp(180px, 30vw, 440px); height: auto; filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.45)); }
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .ficha-tira {
   display: flex;
@@ -158,6 +150,8 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .ficha-tira div { display: flex; flex-direction: column; }
 .ficha-tira span { font-size: 0.7rem; color: rgba(255, 255, 255, 0.62); }
 .ficha-tira strong { font-size: clamp(1.3rem, 3vw, 1.9rem); }
+.ficha-tira .ficha-modelo strong { font-variation-settings: 'wdth' 100; font-weight: 700; line-height: 1.15; max-width: 14ch; }
+.ficha-tira .ficha-modelo { flex-basis: 100%; margin-bottom: 1rem; }
 .ficha-tira em { font-style: normal; font-size: 0.95rem; opacity: 0.7; }
 
 /* ---------- fotos ---------- */
@@ -246,100 +240,76 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 
 /* ---------- ficha técnica ---------- */
 
-/* la foto se achica para que entre junto con la lista en la pantalla */
-.placa { position: relative; margin: 0 auto 2.5rem; width: min(100%, calc(55vh * 1700 / 816)); }
-.placa > img { width: 100%; height: auto; display: block; }
-.placa-leyenda {
-  position: absolute;
-  left: 0;
-  bottom: -2rem;
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--grafito);
-  display: flex;
+.ficha {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(2rem, 4vw, 4rem);
   align-items: center;
-  gap: 0.5rem;
-  min-height: 1.4rem;
 }
-.placa-leyenda b {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--fluo); color: var(--asfalto);
-  font-size: 0.7rem; display: inline-flex; align-items: center; justify-content: center;
-}
+.ficha-foto { width: 100%; height: auto; display: block; }
 
-.llamada {
-  position: absolute;
-  transform: translate(-50%, -50%);
+.especificaciones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 2px solid var(--asfalto);
+  border-left: 1px solid var(--linea);
+}
+.especificaciones li {
+  border-right: 1px solid var(--linea);
+  border-bottom: 1px solid var(--linea);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+}
+.especificaciones li > div,
+.especificaciones li > button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  min-height: 6.2rem;
+  padding: 0.95rem 1rem;
+  text-align: left;
+}
+.especificaciones li > button { cursor: pointer; transition: background 0.15s ease; }
+.especificaciones li > button:hover { background: var(--chapa-hueco); }
+.especificaciones strong { font-size: 0.98rem; line-height: 1.25; font-variation-settings: 'wdth' 106; text-wrap: balance; }
+.especificaciones small { font-size: 0.74rem; color: var(--grafito); }
+.especificaciones .agregado {
+  align-self: flex-start;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
   background: var(--fluo);
   color: var(--asfalto);
-  font-size: 0.8rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  box-shadow: 0 0 0 4px rgba(22, 24, 26, 0.55);
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-  transition: opacity 0.18s ease, transform 0.18s ease;
 }
-.llamada.activa { transform: translate(-50%, -50%) scale(1.25); z-index: 1; }
-.llamada.apagada { opacity: 0.35; }
-.llamada:focus-visible { outline: 2px solid var(--asfalto); outline-offset: 2px; }
-
-.claves {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 0;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-}
-.claves li {
-  display: flex;
-  gap: 0.9rem;
-  align-items: baseline;
-  padding: 1.1rem 0;
-  border-top: 1px solid var(--linea);
-}
-.claves b {
-  flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--asfalto);
-  color: var(--chapa);
-  font-size: 0.75rem;
-  font-weight: 700;
-  display: flex;
+.especificaciones .ver {
+  margin-top: auto;
+  padding-top: 0.4rem;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  align-self: flex-start;
+  gap: 0.3rem;
+  font-size: 0.74rem;
+  color: var(--grafito);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
-.claves li { transition: opacity 0.18s ease; }
-.claves li.apagada { opacity: 0.3; }
-.claves li.activa b { background: var(--fluo); color: var(--asfalto); }
-.claves strong { display: block; font-size: 1.05rem; }
-.claves small { color: var(--grafito); font-size: 0.82rem; }
+.especificaciones li > button:hover .ver { color: var(--asfalto); }
 
-/* equipamiento destacado */
-.equipamiento {
-  list-style: none;
-  margin: 3.5rem 0 0;
-  padding: 0;
-  display: grid;
-  gap: 0;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  border-top: 2px solid var(--asfalto);
+/* ventana de detalle (airbags) */
+.ventana {
+  position: relative;
+  width: min(100%, 620px);
+  background: var(--papel);
+  color: var(--asfalto);
+  padding: 2rem 2.2rem 2.2rem;
+  text-align: left;
 }
-.equipamiento > li { padding: 1.4rem 1.5rem 1.4rem 0; border-bottom: 1px solid var(--linea); }
-.equipamiento > li.ancho { grid-column: 1 / -1; }
-.equipamiento strong { display: block; font-size: 1.15rem; font-variation-settings: 'wdth' 108; }
-.equipamiento p { color: var(--grafito); font-size: 0.85rem; margin: 0.35rem 0 0; max-width: 52ch; }
+.ventana h3 { font-size: 1.9rem; margin-bottom: 0.8rem; }
+.ventana p { color: var(--grafito); font-size: 0.92rem; margin: 0; max-width: 52ch; }
 
 .airbags {
   list-style: none;
@@ -690,12 +660,15 @@ footer {
 @media (max-width: 860px) {
   :root { --gutter: 6vw; }
   .header nav { display: none; }
+  .header .musica { margin-left: auto; }
   .musica a { display: none; }
   .rejilla img { height: 240px; }
   .detalle-info { width: 44px; height: 44px; top: 8px; right: 8px; }
-  .equipamiento > li { padding-right: 0; }
-  .placa { width: 100%; margin-bottom: 3rem; }
-  .llamada { width: 34px; height: 34px; }
+  .ficha { grid-template-columns: 1fr; }
+  .especificaciones { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .especificaciones li > div, .especificaciones li > button { min-height: 0; }
+  .portada-marcas { flex-wrap: wrap; }
+  .ventana { padding: 1.6rem 1.2rem; }
   .visor-historia { max-width: none; }
   .registros > summary { width: 100%; justify-content: space-between; }
   .globo { position: fixed; left: 50%; bottom: 1rem; top: auto; transform: translateX(-50%); width: calc(100vw - 2rem); }

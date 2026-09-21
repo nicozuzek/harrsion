@@ -17,7 +17,7 @@ Página de venta particular, en español, para un Ford Fiesta Kinetic Design Tit
 Todo el contenido vive en `content/car.json`. No hay CMS ni base de datos.
 
 - `vehiculo` — datos del auto, odómetro y precio.
-- `fotos` / `detalles` / `mejoras` — archivos en `public/car/fotos/`, `public/car/detalles/` y `public/car/mejoras/`, con `label`, `nota` y dimensiones. `mejoras` son cosas que se cambiaron para mejor (no marcas), con el mismo formato que `detalles`.
+- `fotos` / `detalles` / `mejoras` — archivos en `public/car/fotos/`, `public/car/detalles/` y `public/car/mejoras/`, con `label`, `nota` y dimensiones. `mejoras` ya no tiene sección propia: la primera entrada con `historia` alimenta la ventana "Tuercas de acero macizo" de Especificaciones. El popup de "7 airbags" sale de `equipamiento[0]`.
 - `giro` — los cuadros de la vuelta al auto, en `public/car/giro/`, **en orden de giro**. El slider los recorre en ese orden.
 - `cochera` — fotos de las cocheras, en `public/car/cochera/`.
 - `equipamiento` — el equipamiento destacado. Un item con `lista` se muestra a ancho completo y numerado (los airbags).
