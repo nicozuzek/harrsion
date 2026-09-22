@@ -675,10 +675,18 @@ footer {
   justify-content: center;
   padding: 2.5rem 1rem;
   background: rgba(12, 14, 15, 0.93);
+  --alto-visor: 82vh;
 }
 .visor-marco { position: relative; max-width: 1100px; width: 100%; text-align: center; }
-.visor-media { position: relative; }
-.visor img { width: 100%; height: auto; max-height: 82vh; object-fit: contain; }
+.visor-media {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: var(--alto-visor);
+}
+.visor img { width: auto; height: auto; max-width: 100%; max-height: var(--alto-visor); object-fit: contain; }
 .visor figcaption { color: #cdd2cf; font-size: 0.8rem; padding-top: 0.8rem; text-align: center; }
 .visor-cerrar, .visor-nav {
   position: absolute;
@@ -697,13 +705,13 @@ footer {
 .visor-nav.sig { right: -1rem; top: 50%; transform: translateY(-50%); }
 .visor-nav:hover, .visor-cerrar:hover { background: rgba(0, 0, 0, 0.8); }
 .visor .escaneo { display: inline-block; width: auto; max-width: 100%; vertical-align: top; }
-.visor .escaneo img { width: auto; height: auto; max-width: 100%; max-height: 82vh; }
+.visor .escaneo img { width: auto; height: auto; max-width: 100%; max-height: var(--alto-visor); }
 .visor-con-historia {
   align-items: flex-start;
   overflow-y: auto;
   padding-block: 1rem;
+  --alto-visor: 58vh;
 }
-.visor-con-historia img { width: auto; max-width: 100%; max-height: 58vh; margin-inline: auto; }
 
 .vacio {
   border: 1px dashed var(--linea);

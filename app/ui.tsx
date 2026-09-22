@@ -260,11 +260,13 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
       ? [vista.pie, (actual as Escaneo).label].filter(Boolean).join(' · ')
       : (actual as Foto).label;
   const varias = vista.lista.length > 1;
+  // el marco toma la proporción de la foto más alta del grupo: así el texto de abajo no salta al pasar
+  const proporcion = Math.min(...vista.lista.map((x) => x.w / x.h));
 
   return (
     <div className={`visor${vista.tipo === 'historia' ? ' visor-con-historia' : ''}`} role="dialog" aria-modal="true" aria-label={pie} onClick={cerrar}>
       <figure className="visor-marco" onClick={(e) => e.stopPropagation()}>
-        <div className="visor-media">
+        <div className="visor-media" style={{ aspectRatio: String(proporcion) }}>
           <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
           {vista.tipo !== 'escaneo' ? (
             <Image
