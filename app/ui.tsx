@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Check, ChevronLeft, ChevronRight, Info, Mail, Pause, Play, RotateCw, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Info, Mail, RotateCw, X } from 'lucide-react';
 
 export type Resalte = { kind: 'date' | 'km'; x: number; y: number; w: number; h: number };
 export type Escaneo = { src: string; w: number; h: number; highlights: Resalte[]; tipo: 'comprobante' | 'foto'; label?: string };
@@ -48,13 +48,6 @@ const usd = (n: number) => new Intl.NumberFormat('es-AR').format(n);
 const fecha = (d: string) =>
   new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(`${d}T12:00:00`));
 const anio = (d: string) => d.slice(0, 4);
-
-const CANCION = {
-  preview:
-    'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ef/54/3d/ef543d55-58cb-320e-8dc7-084336d961d0/mzaf_15679467696516524072.plus.aac.p.m4a',
-  tapa: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/e6/8a/68/e68a688e-129e-cb9d-938f-bc3ee37059ae/075679930910.jpg/300x300bb.jpg',
-  url: 'https://music.apple.com/us/album/see-you-again-feat-charlie-puth/966411595?i=966411602',
-};
 
 /* Ficha técnica: la lista de la derecha; dos ítems abren una ventana con detalle. */
 type Ventana = 'airbags' | 'tuercas';
@@ -104,97 +97,6 @@ function Copiar({ email }: { email: string }) {
     <button type="button" className={`boton${copiado ? ' copiado' : ''}`} onClick={copiar} aria-live="polite">
       {copiado ? <><Check size={17} /> {email} copiado</> : <><Mail size={17} /> Escribirme</>}
     </button>
-  );
-}
-
-const VOLUMEN = 0.5;
-
-function Musica() {
-  const [sonando, setSonando] = useState(false);
-  const [falla, setFalla] = useState(false);
-  const audio = useRef<HTMLAudioElement>(null);
-  const raiz = useRef<HTMLDivElement>(null);
-
-  // Al cargar la página arranca sola, desde el principio y a mitad de volumen.
-  // Si el navegador bloquea el autoplay (lo hace hasta que el usuario toca algo),
-  // se reintenta con el primer toque, clic o tecla en cualquier parte de la página.
-  useEffect(() => {
-    const el = audio.current;
-    if (!el) return;
-    const eventos: (keyof DocumentEventMap)[] = ['pointerdown', 'keydown', 'touchend'];
-
-    const desdeElPrincipio = () =>
-      new Promise<void>((ok, mal) => {
-        el.volume = VOLUMEN;
-        el.currentTime = 0;
-        el.play().then(ok, mal);
-      });
-
-    const quitar = () => eventos.forEach((ev) => document.removeEventListener(ev, primerGesto, true));
-    const primerGesto = (e: Event) => {
-      // el botón de la música ya lo maneja alternar()
-      if (raiz.current?.contains(e.target as Node)) return;
-      desdeElPrincipio().then(() => { setSonando(true); quitar(); }, () => setSonando(false));
-    };
-
-    desdeElPrincipio().then(
-      () => setSonando(true),
-      () => {
-        setSonando(false);
-        eventos.forEach((ev) => document.addEventListener(ev, primerGesto, true));
-      },
-    );
-
-    // si la página vuelve del caché de atrás/adelante, otra vez desde el principio
-    const volver = (e: PageTransitionEvent) => {
-      if (!e.persisted) return;
-      desdeElPrincipio().then(() => setSonando(true), () => setSonando(false));
-    };
-    window.addEventListener('pageshow', volver);
-
-    return () => {
-      quitar();
-      window.removeEventListener('pageshow', volver);
-    };
-  }, []);
-
-  const alternar = () => {
-    const el = audio.current;
-    if (!el || falla) return;
-    if (sonando) {
-      el.pause();
-      setSonando(false);
-    } else {
-      el.volume = VOLUMEN;
-      el.currentTime = 0;
-      el.play().then(
-        () => setSonando(true),
-        () => { setSonando(false); setFalla(true); },
-      );
-    }
-  };
-
-  return (
-    <div ref={raiz} className={`musica${sonando ? ' sonando' : ''}`}>
-      <audio
-        ref={audio}
-        src={CANCION.preview}
-        preload="auto"
-        onEnded={() => setSonando(false)}
-        onLoadedMetadata={(e) => { e.currentTarget.volume = VOLUMEN; }}
-        onError={() => { setSonando(false); setFalla(true); }}
-      />
-      <button
-        onClick={alternar}
-        disabled={falla}
-        aria-pressed={sonando}
-        aria-label={falla ? 'No se pudo cargar la canción' : sonando ? 'Pausar See You Again' : 'Reproducir See You Again'}
-      >
-        {sonando ? <Pause size={13} /> : <Play size={13} />}
-      </button>
-      <Image className="disco" src={CANCION.tapa} alt="" width={26} height={26} />
-      <a href={CANCION.url} target="_blank" rel="noreferrer">See You Again</a>
-    </div>
   );
 }
 
@@ -618,7 +520,6 @@ export default function Pagina({
           <a href="#cochera">Cochera</a>
           <a href="#precio">Precio</a>
         </nav>
-        <Musica />
       </header>
 
       <main>
@@ -699,8 +600,9 @@ export default function Pagina({
             <h2>Service y kilómetros</h2>
           </div>
 
-          <div className="grafico-caja">
-            <div className="grafico-lienzo" ref={caja}>
+          <div className="historial-interactivo">
+            <div className="grafico-caja">
+              <div className="grafico-lienzo" ref={caja}>
             <svg className={`grafico${compacto ? ' compacto' : ''}`} viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img"
               aria-label={`Kilometraje registrado entre ${anio(services[0].date)} y ${anio(vehiculo.odometroFecha)}, de ${km(conKm[0].mileage!)} a ${km(vehiculo.odometro)} kilómetros. El detalle completo está en la tabla que sigue.`}>
               <defs>
@@ -805,18 +707,24 @@ export default function Pagina({
               </text>
             </svg>
 
-            {marcadorActivo && (
-              <Globo
-                marcador={marcadorActivo}
-                ancho={ANCHO}
-                alto={ALTO}
-                vehiculo={vehiculo}
-                fijo={fijo}
-                cerrar={cerrarGlobo}
-                ampliar={abrirEscaneo}
-              />
-            )}
+              </div>
             </div>
+            <aside className="historial-detalle" aria-live="polite">
+              {marcadorActivo ? (
+                <Globo
+                  marcador={marcadorActivo}
+                  vehiculo={vehiculo}
+                  fijo={fijo}
+                  cerrar={cerrarGlobo}
+                  ampliar={abrirEscaneo}
+                />
+              ) : (
+                <div className="historial-ayuda">
+                  <strong>Detalle de cada service</strong>
+                  <p>Pasá el cursor o tocá un punto del gráfico para ver la visita y su comprobante.</p>
+                </div>
+              )}
+            </aside>
           </div>
 
           <details className="registros">
@@ -976,34 +884,22 @@ function FilaGlobo({
 
 function Globo({
   marcador,
-  ancho,
-  alto,
   vehiculo,
   fijo,
   cerrar,
   ampliar,
 }: {
-  marcador: { cx: number; cy: number; entradas: EntradaGlobo[] };
-  ancho: number;
-  alto: number;
+  marcador: { entradas: EntradaGlobo[] };
   vehiculo: Vehiculo;
   fijo: boolean;
   cerrar: () => void;
   ampliar: (s: Servicio) => void;
 }) {
-  const { cx, cy, entradas } = marcador;
+  const { entradas } = marcador;
   const varias = entradas.length > 1;
-  const derecha = cx > ancho * 0.58;
-  const abajo = cy < alto * 0.42;
-
-  const estilo: React.CSSProperties = {
-    left: `${(cx / ancho) * 100}%`,
-    top: `${(cy / alto) * 100}%`,
-    transform: `translate(${derecha ? 'calc(-100% - 18px)' : '18px'}, ${abajo ? '0%' : '-100%'})`,
-  };
 
   return (
-    <div className={`globo${fijo ? ' fijo' : ''}${varias ? ' multiple' : ''}`} style={estilo} role="status">
+    <div className={`globo${fijo ? ' fijo' : ''}${varias ? ' multiple' : ''}`} role="status">
       {varias && <div className="globo-encabezado">{entradas.length} visitas casi el mismo día</div>}
       {entradas.map((e, i) => (
         <FilaGlobo
