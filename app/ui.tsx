@@ -64,9 +64,13 @@ const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana 
   { titulo: 'Espejos exteriores con visor de punto ciego' },
   { titulo: 'Blindaje marca Strong', agregado: true },
   { titulo: 'Kit luces xenón', agregado: true },
+  { titulo: 'Sensores de estacionamiento traseros', agregado: true },
   { titulo: 'Tuercas de acero macizo', agregado: true, ventana: 'tuercas' },
 ];
-const NOTAS: Record<string, string> = { 'Kit luces xenón': 'Viene desinstalado' };
+const NOTAS: Record<string, string> = {
+  'Kit luces xenón': 'Viene desinstalado',
+  'Sensores de estacionamiento traseros': 'Agregados en agencia',
+};
 
 /* Botón "Escribirme": copia el mail al portapapeles y avisa un momento. */
 function Copiar({ email }: { email: string }) {
@@ -576,6 +580,7 @@ export default function Pagina({
               <div><span>Año</span><strong>{vehiculo.anio}</strong></div>
               <div><span>Odómetro</span><strong>{km(vehiculo.odometro)} <em>km</em></strong></div>
               <div><span>Registros de service</span><strong>{services.length}</strong></div>
+              <div><span>Historial</span><strong>Segundo dueño</strong></div>
             </div>
           </div>
         </section>
