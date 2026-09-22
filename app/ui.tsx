@@ -277,6 +277,17 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
           ) : (
             <Escaneado escaneo={actual as Escaneo} alt={pie} />
           )}
+          {/* el resto del carrusel se descarga apenas se abre, así pasar de foto no espera */}
+          {varias && (
+            <div hidden>
+              {vista.lista.map((item, n) => {
+                if (n === vista.i) return null;
+                const src = vista.tipo === 'escaneo' ? (item as Escaneo).src : `/car/${vista.carpeta}/${(item as Foto).file}`;
+                const sizes = vista.tipo === 'escaneo' ? '(max-width: 860px) 60vw, 700px' : '100vw';
+                return <Image key={src} src={src} alt="" width={item.w} height={item.h} sizes={sizes} loading="eager" />;
+              })}
+            </div>
+          )}
           {varias && (
             <>
               <button className="visor-nav prev" onClick={() => mover(-1)} aria-label="Anterior"><ChevronLeft size={22} /></button>
