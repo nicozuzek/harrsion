@@ -878,8 +878,8 @@ export default function Pagina({
       )}
       {ventana === 'polarizado' && (
         <Ventana titulo="Polarizado antivandálico marca Strong" cerrar={() => setVentana(null)}>
-          <p>El logo de Strong está grabado en la luneta trasera.</p>
-          <Image className="ventana-foto" src="/car/mejoras/polarizado-strong.jpg" alt="Logo de Strong en la luneta trasera" width={960} height={400} sizes="(max-width: 860px) 90vw, 560px" />
+          <p>El logo de Strong está en la luneta trasera, arriba del sticker de dietrich.</p>
+          <Image className="ventana-foto" src="/car/mejoras/polarizado-strong.jpg" alt="Logo de Strong marcado en la luneta trasera" width={960} height={446} sizes="(max-width: 860px) 90vw, 560px" />
         </Ventana>
       )}
     </>
