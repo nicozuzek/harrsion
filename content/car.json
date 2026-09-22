@@ -877,7 +877,25 @@
       "workshop": "Euroservice",
       "category": "Arreglo",
       "notes": "Cambio de las patas de motor trasera y delantera derecha.",
-      "mileage": 91000
+      "mileage": 91000,
+      "scans": [
+        {
+          "src": "/car/trabajos/2026-07-22-1.jpg",
+          "w": 960,
+          "h": 1280,
+          "tipo": "foto",
+          "label": "Caja Ford de la pata de motor delantera derecha",
+          "highlights": []
+        },
+        {
+          "src": "/car/trabajos/2026-07-22-2.jpg",
+          "w": 1599,
+          "h": 899,
+          "tipo": "foto",
+          "label": "Pata de motor trasera: la retirada arriba y la nueva abajo",
+          "highlights": []
+        }
+      ]
     }
   ],
   "giro": [
