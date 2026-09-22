@@ -17,15 +17,17 @@ export default function OpenGraphImage() {
   return new ImageResponse(
     <div style={{ display: 'flex', width: '100%', height: '100%', background: '#dde0de', color: '#16181a' }}>
       {/* foto a la derecha, se funde con el fondo por la izquierda */}
-      <img src={foto} alt="" width={440} height={630} style={{ position: 'absolute', top: 0, right: 0 }} />
+      <img src={foto} alt="" width={580} height={630} style={{ position: 'absolute', top: 0, right: 0 }} />
       <div
         style={{
           position: 'absolute',
           top: 0,
-          right: 380,
-          width: 60,
+          right: 340,
+          width: 240,
           height: 630,
-          backgroundImage: 'linear-gradient(to right, #dde0de, rgba(221, 224, 222, 0))',
+          // varios cortes para que el fundido sea suave, sin borde visible
+          backgroundImage:
+            'linear-gradient(to right, rgba(221, 224, 222, 1) 0%, rgba(221, 224, 222, 0.92) 20%, rgba(221, 224, 222, 0.72) 40%, rgba(221, 224, 222, 0.45) 60%, rgba(221, 224, 222, 0.18) 80%, rgba(221, 224, 222, 0) 100%)',
         }}
       />
       <div
