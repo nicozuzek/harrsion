@@ -50,7 +50,7 @@ const fecha = (d: string) =>
 const anio = (d: string) => d.slice(0, 4);
 
 /* Ficha técnica: la lista de la derecha; dos ítems abren una ventana con detalle. */
-type Ventana = 'airbags' | 'tuercas';
+type Ventana = 'airbags' | 'tuercas' | 'polarizado';
 const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana }[] = [
   { titulo: 'Motor 1.6' },
   { titulo: 'Caja manual de 5ta' },
@@ -62,7 +62,7 @@ const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana 
   { titulo: 'Espejo retrovisor electrocrómico' },
   { titulo: 'Dirección eléctrica' },
   { titulo: 'Espejos exteriores con visor de punto ciego' },
-  { titulo: 'Blindaje marca Strong', agregado: true },
+  { titulo: 'Polarizado antivandálico marca Strong', agregado: true, ventana: 'polarizado' },
   { titulo: 'Kit luces xenón', agregado: true },
   { titulo: 'Sensores de estacionamiento traseros', agregado: true },
   { titulo: 'Tuercas de acero macizo', agregado: true, ventana: 'tuercas' },
@@ -874,6 +874,12 @@ export default function Pagina({
               <li key={a}><span>{i + 1}</span>{a}</li>
             ))}
           </ol>
+        </Ventana>
+      )}
+      {ventana === 'polarizado' && (
+        <Ventana titulo="Polarizado antivandálico marca Strong" cerrar={() => setVentana(null)}>
+          <p>El logo de Strong está grabado en la luneta trasera.</p>
+          <Image className="ventana-foto" src="/car/mejoras/polarizado-strong.jpg" alt="Logo de Strong en la luneta trasera" width={960} height={400} sizes="(max-width: 860px) 90vw, 560px" />
         </Ventana>
       )}
     </>
