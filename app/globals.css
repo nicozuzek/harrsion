@@ -135,8 +135,7 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   margin: 0 0 2.4rem;
   line-height: 1;
 }
-.portada-ford { width: clamp(96px, 13vw, 190px); height: auto; filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.45)); }
-.portada-fiesta { width: clamp(180px, 30vw, 440px); height: auto; filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.45)); }
+.portada-ford, .portada-fiesta { height: clamp(45px, 7.5vw, 110px); width: auto; filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.45)); }
 .oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 .ficha-tira {
@@ -569,7 +568,6 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 }
 .cochera-grid button { cursor: pointer; text-align: left; }
 .cochera-grid img { width: 100%; height: clamp(240px, 30vw, 380px); object-fit: cover; }
-.cochera-grid figcaption { font-size: 0.8rem; color: var(--grafito); padding-top: 0.6rem; }
 
 .visor-cuenta { color: #8e9693; margin-left: 0.6rem; }
 .visor-historia {
@@ -603,6 +601,8 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   margin-top: 1.2rem;
 }
 .boton:hover { background: var(--grafito); }
+button.boton { border: 0; cursor: pointer; font: inherit; font-weight: 600; font-size: 0.92rem; transition: background 0.2s; }
+.boton.copiado { background: #1f6f3f; }
 
 footer {
   display: flex;

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, Info, Mail, Pause, Play, RotateCw, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Info, Mail, Pause, Play, RotateCw, X } from 'lucide-react';
 
 export type Resalte = { kind: 'date' | 'km'; x: number; y: number; w: number; h: number };
 export type Escaneo = { src: string; w: number; h: number; highlights: Resalte[]; tipo: 'comprobante' | 'foto'; label?: string };
@@ -75,24 +75,87 @@ const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana 
 ];
 const NOTAS: Record<string, string> = { 'Kit luces xenón': 'Viene desinstalado' };
 
+/* Botón "Escribirme": copia el mail al portapapeles y avisa un momento. */
+function Copiar({ email }: { email: string }) {
+  const [copiado, setCopiado] = useState(false);
+  const copiar = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(email);
+      } else {
+        const t = document.createElement('textarea');
+        t.value = email;
+        t.setAttribute('readonly', '');
+        t.style.position = 'fixed';
+        t.style.opacity = '0';
+        document.body.appendChild(t);
+        t.select();
+        document.execCommand('copy');
+        t.remove();
+      }
+      setCopiado(true);
+      window.setTimeout(() => setCopiado(false), 2200);
+    } catch {
+      // si el portapapeles falla, al menos que el mail quede a la vista
+      window.prompt('Copiá el mail:', email);
+    }
+  };
+  return (
+    <button type="button" className={`boton${copiado ? ' copiado' : ''}`} onClick={copiar} aria-live="polite">
+      {copiado ? <><Check size={17} /> {email} copiado</> : <><Mail size={17} /> Escribirme</>}
+    </button>
+  );
+}
+
 const VOLUMEN = 0.5;
 
 function Musica() {
   const [sonando, setSonando] = useState(false);
   const [falla, setFalla] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
+  const raiz = useRef<HTMLDivElement>(null);
 
-  // al cargar la página arranca sola, desde el principio y a mitad de volumen.
-  // Si el navegador bloquea el autoplay queda en pausa y el botón sigue andando.
+  // Al cargar la página arranca sola, desde el principio y a mitad de volumen.
+  // Si el navegador bloquea el autoplay (lo hace hasta que el usuario toca algo),
+  // se reintenta con el primer toque, clic o tecla en cualquier parte de la página.
   useEffect(() => {
     const el = audio.current;
     if (!el) return;
-    el.volume = VOLUMEN;
-    el.currentTime = 0;
-    el.play().then(
+    const eventos: (keyof DocumentEventMap)[] = ['pointerdown', 'keydown', 'touchend'];
+
+    const desdeElPrincipio = () =>
+      new Promise<void>((ok, mal) => {
+        el.volume = VOLUMEN;
+        el.currentTime = 0;
+        el.play().then(ok, mal);
+      });
+
+    const quitar = () => eventos.forEach((ev) => document.removeEventListener(ev, primerGesto, true));
+    const primerGesto = (e: Event) => {
+      // el botón de la música ya lo maneja alternar()
+      if (raiz.current?.contains(e.target as Node)) return;
+      desdeElPrincipio().then(() => { setSonando(true); quitar(); }, () => setSonando(false));
+    };
+
+    desdeElPrincipio().then(
       () => setSonando(true),
-      () => setSonando(false),
+      () => {
+        setSonando(false);
+        eventos.forEach((ev) => document.addEventListener(ev, primerGesto, true));
+      },
     );
+
+    // si la página vuelve del caché de atrás/adelante, otra vez desde el principio
+    const volver = (e: PageTransitionEvent) => {
+      if (!e.persisted) return;
+      desdeElPrincipio().then(() => setSonando(true), () => setSonando(false));
+    };
+    window.addEventListener('pageshow', volver);
+
+    return () => {
+      quitar();
+      window.removeEventListener('pageshow', volver);
+    };
   }, []);
 
   const alternar = () => {
@@ -112,7 +175,7 @@ function Musica() {
   };
 
   return (
-    <div className={`musica${sonando ? ' sonando' : ''}`}>
+    <div ref={raiz} className={`musica${sonando ? ' sonando' : ''}`}>
       <audio
         ref={audio}
         src={CANCION.preview}
@@ -238,7 +301,6 @@ function Tarjetas({ lista, carpeta, abrir }: { lista: Foto[]; carpeta: string; a
             </button>
           )}
           <strong>{f.label}</strong>
-          {f.nota && <small>{f.nota}</small>}
         </div>
       ))}
     </div>
@@ -819,7 +881,6 @@ export default function Pagina({
                   aria-label={`Ampliar: ${c.label}`}
                 >
                   <Image src={`/car/cochera/${c.file}`} alt={c.label} width={c.w} height={c.h} sizes="(max-width: 860px) 92vw, 560px" />
-                  <figcaption>{c.label}</figcaption>
                 </button>
               ))}
             </div>
@@ -832,13 +893,7 @@ export default function Pagina({
               <span>Precio</span>USD {usd(vehiculo.precioUsd)}
             </div>
             <div>
-              <p>
-                {vehiculo.modelo} {vehiculo.anio}, {km(vehiculo.odometro)} km, con los {services.length} registros
-                de service que ves más arriba. Escribime y lo vemos.
-              </p>
-              <a className="boton" href={`mailto:${vehiculo.contacto}?subject=${encodeURIComponent('Consulta por el Fiesta 2012')}`}>
-                <Mail size={17} /> Escribirme
-              </a>
+              <Copiar email={vehiculo.contacto} />
             </div>
           </div>
         </section>
