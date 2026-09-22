@@ -111,6 +111,13 @@
       "shot": "baul",
       "w": 2200,
       "h": 1650
+    },
+    {
+      "file": "19-baul-por-dentro.jpg",
+      "label": "Baúl por dentro",
+      "shot": "baul",
+      "w": 1280,
+      "h": 960
     }
   ],
   "detalles": [
@@ -174,6 +181,13 @@
       "nota": "Estado de la llanta de aleación y la cubierta 195/50 R16 del lado derecho.",
       "w": 2200,
       "h": 1650
+    },
+    {
+      "file": "09-resorte-roto-asiento-conductor.jpg",
+      "label": "Resorte roto en el asiento del conductor",
+      "nota": "Un resorte del respaldo del asiento del conductor asoma por la tela.",
+      "w": 960,
+      "h": 1280
     }
   ],
   "mejoras": [
@@ -954,6 +968,12 @@
       "label": "Cochera en subsuelo",
       "w": 1600,
       "h": 2133
+    },
+    {
+      "file": "03.jpg",
+      "label": "Cochera cubierta",
+      "w": 960,
+      "h": 1280
     }
   ],
   "equipamiento": [

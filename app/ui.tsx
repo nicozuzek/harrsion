@@ -647,7 +647,7 @@ export default function Pagina({
                 }}
               >
                 {soloPropio ? <ZoomOut size={17} /> : <ZoomIn size={17} />}
-                {soloPropio ? 'Ver historial completo' : 'Ver desde que lo compré'}
+                {soloPropio ? 'Ver historial completo' : 'Ver dueño actual'}
               </button>
             )}
           </div>
