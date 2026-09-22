@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Check, ChevronLeft, ChevronRight, Info, Mail, RotateCw, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Info, Mail, RotateCw, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 export type Resalte = { kind: 'date' | 'km'; x: number; y: number; w: number; h: number };
 export type Escaneo = { src: string; w: number; h: number; highlights: Resalte[]; tipo: 'comprobante' | 'foto'; label?: string };
@@ -343,6 +343,7 @@ export default function Pagina({
   const [vista, setVista] = useState<Vista | null>(null);
   const [activo, setActivo] = useState<string | null>(null);
   const [fijo, setFijo] = useState(false);
+  const [soloPropio, setSoloPropio] = useState(false);
   const [ventana, setVentana] = useState<Ventana | null>(null);
   const airbags = equipamiento.find((e) => e.lista);
   const tuercas = mejoras.find((m) => m.historia)?.historia;
@@ -356,20 +357,52 @@ export default function Pagina({
   const conKm = useMemo(() => services.filter((s) => s.mileage), [services]);
   const sinKm = useMemo(() => services.filter((s) => !s.mileage), [services]);
 
-  const { puntos, ejeX, ejeY, tramos, base, ultimo, marcadores, marcasEstimadas, compra } = useMemo(() => {
+  const { ejeX, ejeY, tramos, base, ultimo, marcadores, marcasEstimadas, compra, cantidadEstimados } = useMemo(() => {
     const t = (f: string) => new Date(`${f}T12:00:00`).getTime();
     const odo = { fecha: vehiculo.odometroFecha, km: vehiculo.odometro };
     const crudos = [
       ...conKm.map((s) => ({ id: s.id, fecha: s.date, km: s.mileage!, servicio: s })),
       { id: 'odometro', fecha: odo.fecha, km: odo.km, servicio: null as Servicio | null },
     ];
-    const t0 = t(crudos[0].fecha);
+    const tTotal0 = t(crudos[0].fecha);
     const t1 = t(crudos[crudos.length - 1].fecha);
-    const kmMax = Math.ceil(Math.max(...crudos.map((p) => p.km)) / 20000) * 20000;
-    const px = (f: string) => PAD.izq + ((t(f) - t0) / (t1 - t0)) * (ANCHO - PAD.izq - PAD.der);
-    const py = (k: number) => ALTO - PAD.aba - (k / kmMax) * (ALTO - PAD.arr - PAD.aba);
-    const puntos = crudos.map((p) => ({ ...p, cx: px(p.fecha), cy: py(p.km) }));
+    // fecha aproximada en la que el odómetro cruzó los km de compra
+    const fechaEnKm = (k: number) => {
+      for (let i = 1; i < crudos.length; i++) {
+        const a = crudos[i - 1], b = crudos[i];
+        if (k <= b.km) {
+          const salto = b.km - a.km;
+          const r = salto ? (k - a.km) / salto : 0;
+          return t(a.fecha) + r * (t(b.fecha) - t(a.fecha));
+        }
+      }
+      return t1;
+    };
+    const kmCompra = vehiculo.compraKm;
+    const fechaCompra = kmCompra ? fechaEnKm(kmCompra) : null;
+    const t0 = soloPropio && fechaCompra ? fechaCompra : tTotal0;
+    const pasoKm = soloPropio ? 10000 : 20000;
+    const kmMin = soloPropio && kmCompra ? Math.floor(kmCompra / pasoKm) * pasoKm : 0;
+    const maximoCrudo = Math.max(...crudos.map((p) => p.km));
+    const kmMax = Math.max(kmMin + pasoKm, Math.ceil(maximoCrudo / pasoKm) * pasoKm);
+    const pxMs = (valor: number) => PAD.izq + ((valor - t0) / (t1 - t0)) * (ANCHO - PAD.izq - PAD.der);
+    const px = (f: string) => pxMs(t(f));
+    const py = (k: number) => ALTO - PAD.aba - ((k - kmMin) / (kmMax - kmMin)) * (ALTO - PAD.arr - PAD.aba);
+    const puntosTodos = crudos.map((p) => ({ ...p, cx: px(p.fecha), cy: py(p.km) }));
+    const puntos = soloPropio && fechaCompra
+      ? puntosTodos.filter((p) => t(p.fecha) >= fechaCompra)
+      : puntosTodos;
+    const compra = kmCompra
+      ? {
+          km: kmCompra,
+          cx: pxMs(fechaCompra!),
+          cy: py(kmCompra),
+        }
+      : null;
 
+    const puntosLinea = soloPropio && compra && fechaCompra
+      ? [compra, ...puntos.filter((p) => t(p.fecha) > fechaCompra)]
+      : puntos;
     const base = ALTO - PAD.aba;
     const linea = (pts: { cx: number; cy: number }[]) =>
       pts.map((p, i) => `${i ? 'L' : 'M'} ${p.cx.toFixed(1)} ${p.cy.toFixed(1)}`).join(' ');
@@ -389,34 +422,16 @@ export default function Pagina({
       return crudos[crudos.length - 1].km;
     };
 
-    const estimados = sinKm.map((s) => {
-      const km = kmEnFecha(s.date);
-      return { s, km, cx: px(s.date), cy: py(km) };
-    });
-
-    // fecha aproximada en la que el odómetro cruzó los km de compra
-    const fechaEnKm = (k: number) => {
-      for (let i = 1; i < crudos.length; i++) {
-        const a = crudos[i - 1], b = crudos[i];
-        if (k <= b.km) {
-          const r = (k - a.km) / (b.km - a.km);
-          return t(a.fecha) + r * (t(b.fecha) - t(a.fecha));
-        }
-      }
-      return t1;
-    };
-    const kmCompra = vehiculo.compraKm;
-    const compra = kmCompra
-      ? {
-          km: kmCompra,
-          cx: PAD.izq + ((fechaEnKm(kmCompra) - t0) / (t1 - t0)) * (ANCHO - PAD.izq - PAD.der),
-          cy: py(kmCompra),
-        }
-      : null;
+    const estimados = sinKm
+      .filter((s) => t(s.date) >= t0)
+      .map((s) => {
+        const km = kmEnFecha(s.date);
+        return { s, km, cx: px(s.date), cy: py(km) };
+      });
 
     // dos tramos: hasta la compra y desde la compra
     let tramos: { d: string; area: string; x0: number; x1: number }[];
-    if (compra) {
+    if (compra && !soloPropio) {
       const corte = puntos.findIndex((p) => p.cx >= compra.cx);
       const antes = [...puntos.slice(0, Math.max(corte, 1)), compra];
       const despues = [compra, ...puntos.slice(Math.max(corte, 1))];
@@ -425,16 +440,19 @@ export default function Pagina({
         { d: linea(despues), area: areaDe(despues), x0: compra.cx, x1: despues[despues.length - 1].cx },
       ];
     } else {
-      tramos = [{ d: linea(puntos), area: areaDe(puntos), x0: puntos[0].cx, x1: puntos[puntos.length - 1].cx }];
+      tramos = [{ d: linea(puntosLinea), area: areaDe(puntosLinea), x0: puntosLinea[0].cx, x1: puntosLinea[puntosLinea.length - 1].cx }];
     }
 
     const anios: { a: string; x: number }[] = [];
-    for (let a = 2013; a <= 2026; a += compacto ? 3 : 2) {
+    const primerAnio = new Date(t0).getFullYear();
+    const ultimoAnio = new Date(t1).getFullYear();
+    const pasoAnio = soloPropio ? 1 : compacto ? 3 : 2;
+    for (let a = primerAnio; a <= ultimoAnio; a += pasoAnio) {
       const x = px(`${a}-01-01`);
       if (x >= PAD.izq - 4 && x <= ANCHO - PAD.der) anios.push({ a: String(a), x });
     }
     const ejeY: { k: number; y: number }[] = [];
-    for (let k = 0; k <= kmMax; k += 20000) ejeY.push({ k, y: py(k) });
+    for (let k = kmMin; k <= kmMax; k += pasoKm) ejeY.push({ k, y: py(k) });
 
     // dos registros con fechas y km casi iguales quedan uno encima del otro: se agrupan en un marcador
     const agrupar = <T extends { cx: number; cy: number }>(items: T[], tope: number) => {
@@ -475,8 +493,18 @@ export default function Pagina({
       })),
     );
 
-    return { puntos, ejeX: anios, ejeY, tramos, base, ultimo: puntos[puntos.length - 1], marcadores, marcasEstimadas, compra };
-  }, [conKm, sinKm, vehiculo.odometro, vehiculo.odometroFecha, vehiculo.compraKm, ANCHO, ALTO, PAD, compacto]);
+    return {
+      ejeX: anios,
+      ejeY,
+      tramos,
+      base,
+      ultimo: puntosLinea[puntosLinea.length - 1],
+      marcadores,
+      marcasEstimadas,
+      compra,
+      cantidadEstimados: estimados.length,
+    };
+  }, [conKm, sinKm, vehiculo.odometro, vehiculo.odometroFecha, vehiculo.compraKm, ANCHO, ALTO, PAD, compacto, soloPropio]);
 
   useEffect(() => {
     if (!caja.current) return;
@@ -488,7 +516,7 @@ export default function Pagina({
     );
     obs.observe(caja.current);
     return () => obs.disconnect();
-  }, []);
+  }, [soloPropio]);
 
   const marcadorActivo = useMemo(
     () => [...marcadores, ...marcasEstimadas].find((m) => m.id === activo) ?? null,
@@ -598,15 +626,34 @@ export default function Pagina({
         </section>
 
         <section id="historial" className="seccion historial">
-          <div className="seccion-intro">
-            <h2>Service y kilómetros</h2>
+          <div className="historial-cabecera">
+            <div className="seccion-intro">
+              <h2>Service y kilómetros</h2>
+            </div>
+            {vehiculo.compraKm && (
+              <button
+                type="button"
+                className="zoom-historial"
+                aria-pressed={soloPropio}
+                onClick={() => {
+                  setSoloPropio((actual) => !actual);
+                  setActivo(null);
+                  setFijo(false);
+                }}
+              >
+                {soloPropio ? <ZoomOut size={17} /> : <ZoomIn size={17} />}
+                {soloPropio ? 'Ver historial completo' : 'Ver desde que lo compré'}
+              </button>
+            )}
           </div>
 
           <div className="historial-interactivo">
             <div className="grafico-caja">
               <div className="grafico-lienzo" ref={caja}>
             <svg className={`grafico${compacto ? ' compacto' : ''}`} viewBox={`0 0 ${ANCHO} ${ALTO}`} role="img"
-              aria-label={`Kilometraje registrado entre ${anio(services[0].date)} y ${anio(vehiculo.odometroFecha)}, de ${km(conKm[0].mileage!)} a ${km(vehiculo.odometro)} kilómetros. El detalle completo está en la tabla que sigue.`}>
+              aria-label={soloPropio
+                ? `Kilometraje durante el período del dueño actual, desde aproximadamente ${km(vehiculo.compraKm!)} hasta ${km(vehiculo.odometro)} kilómetros. El detalle completo está en la tabla que sigue.`
+                : `Kilometraje registrado entre ${anio(services[0].date)} y ${anio(vehiculo.odometroFecha)}, de ${km(conKm[0].mileage!)} a ${km(vehiculo.odometro)} kilómetros. El detalle completo está en la tabla que sigue.`}>
               <defs>
                 <linearGradient id="degradado" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0" stopColor="#7cc7f0" stopOpacity="0.2" />
@@ -643,7 +690,7 @@ export default function Pagina({
                   d={tr.d}
                 />
               ))}
-              {compra && <line className="corte" x1={compra.cx} y1={compra.cy} x2={compra.cx} y2={base} />}
+              {compra && !soloPropio && <line className="corte" x1={compra.cx} y1={compra.cy} x2={compra.cx} y2={base} />}
               {marcasEstimadas.map((m) => (
                 <g
                   key={m.id}
@@ -665,14 +712,14 @@ export default function Pagina({
 
               <text className="rail-nota" x={PAD.izq} y={ALTO - 12}>
                 {compacto
-                  ? `Punteado: ${sinKm.length} registros sin km, estimados`
-                  : `Líneas punteadas: ${sinKm.length} registros sin kilometraje anotado, estimado sobre la curva`}
+                  ? `Punteado: ${cantidadEstimados} registros sin km, estimados`
+                  : `Líneas punteadas: ${cantidadEstimados} registros sin kilometraje anotado, estimado sobre la curva`}
               </text>
 
               {marcadores.map((m) => (
                 <g
                   key={m.id}
-                  className={`punto${m.odometro ? ' punto-odometro' : ''}${compra && m.cx < compra.cx ? ' previo' : ''}${activo === m.id ? ' activo' : ''}`}
+                  className={`punto${m.odometro ? ' punto-odometro' : ''}${compra && !soloPropio && m.cx < compra.cx ? ' previo' : ''}${activo === m.id ? ' activo' : ''}`}
                   tabIndex={0}
                   role="button"
                   aria-label={m.entradas
