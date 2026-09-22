@@ -189,7 +189,7 @@
         "texto": "Las tuercas originales del Fiesta son de acero pero con un capuchón de metal blando por encima. Con el uso el capuchón se hincha y se deshace, la llave de rueda deja de agarrar y después no se puede sacar la rueda. Es una falla conocida del modelo. Se cambiaron todas por tuercas de acero macizo, sin capuchón.",
         "enlace": {
           "texto": "Las tuercas que se pusieron",
-          "url": "https://www.amazon.com/dp/B0D9PLY77L"
+          "url": "https://www.amazon.com/dp/B0BGVHFY7V"
         },
         "fotos": [
           {
@@ -209,6 +209,18 @@
             "label": "El capuchón blando, deshecho",
             "w": 1500,
             "h": 1998
+          },
+          {
+            "file": "04-tuercas-nuevas.jpg",
+            "label": "Las 20 tuercas de acero macizo antes de colocarlas",
+            "w": 2000,
+            "h": 1500
+          },
+          {
+            "file": "05-caja-white-knight.jpg",
+            "label": "Caja de las tuercas White Knight M12 × 1,50 instaladas",
+            "w": 2000,
+            "h": 1500
           }
         ]
       }

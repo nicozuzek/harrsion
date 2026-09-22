@@ -431,8 +431,23 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   display: flex;
   gap: 0.9rem;
 }
-.globo.fijo { pointer-events: auto; }
+.globo.fijo { pointer-events: auto; padding-top: 2.8rem; }
 .globo.multiple { display: block; }
+.globo-cerrar {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--asfalto);
+  color: #fff;
+  cursor: pointer;
+}
+.globo-cerrar:hover { background: var(--grafito); }
 .historial-detalle {
   position: sticky;
   top: 82px;
@@ -631,6 +646,7 @@ footer {
   background: rgba(12, 14, 15, 0.93);
 }
 .visor-marco { position: relative; max-width: 1100px; width: 100%; text-align: center; }
+.visor-media { position: relative; }
 .visor img { width: 100%; height: auto; max-height: 82vh; object-fit: contain; }
 .visor figcaption { color: #cdd2cf; font-size: 0.8rem; padding-top: 0.8rem; text-align: center; }
 .visor-cerrar, .visor-nav {
@@ -645,12 +661,18 @@ footer {
   align-items: center;
   justify-content: center;
 }
-.visor-cerrar { top: -3.2rem; right: 0; }
+.visor-cerrar { top: 0.75rem; right: 0.75rem; z-index: 2; }
 .visor-nav.prev { left: -1rem; top: 50%; transform: translateY(-50%); }
 .visor-nav.sig { right: -1rem; top: 50%; transform: translateY(-50%); }
 .visor-nav:hover, .visor-cerrar:hover { background: rgba(0, 0, 0, 0.8); }
 .visor .escaneo { display: inline-block; width: auto; max-width: 100%; vertical-align: top; }
 .visor .escaneo img { width: auto; height: auto; max-width: 100%; max-height: 82vh; }
+.visor-con-historia {
+  align-items: flex-start;
+  overflow-y: auto;
+  padding-block: 1rem;
+}
+.visor-con-historia img { width: auto; max-width: 100%; max-height: 58vh; margin-inline: auto; }
 
 .vacio {
   border: 1px dashed var(--linea);

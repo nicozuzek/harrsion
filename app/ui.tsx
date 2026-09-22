@@ -258,26 +258,28 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
   const varias = vista.lista.length > 1;
 
   return (
-    <div className="visor" role="dialog" aria-modal="true" aria-label={pie} onClick={cerrar}>
+    <div className={`visor${vista.tipo === 'historia' ? ' visor-con-historia' : ''}`} role="dialog" aria-modal="true" aria-label={pie} onClick={cerrar}>
       <figure className="visor-marco" onClick={(e) => e.stopPropagation()}>
-        <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
-        {vista.tipo !== 'escaneo' ? (
-          <Image
-            src={`/car/${vista.carpeta}/${(actual as Foto).file}`}
-            alt={(actual as Foto).label}
-            width={actual.w}
-            height={actual.h}
-            sizes="100vw"
-          />
-        ) : (
-          <Escaneado escaneo={actual as Escaneo} alt={pie} />
-        )}
-        {varias && (
-          <>
-            <button className="visor-nav prev" onClick={() => mover(-1)} aria-label="Anterior"><ChevronLeft size={22} /></button>
-            <button className="visor-nav sig" onClick={() => mover(1)} aria-label="Siguiente"><ChevronRight size={22} /></button>
-          </>
-        )}
+        <div className="visor-media">
+          <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
+          {vista.tipo !== 'escaneo' ? (
+            <Image
+              src={`/car/${vista.carpeta}/${(actual as Foto).file}`}
+              alt={(actual as Foto).label}
+              width={actual.w}
+              height={actual.h}
+              sizes="100vw"
+            />
+          ) : (
+            <Escaneado escaneo={actual as Escaneo} alt={pie} />
+          )}
+          {varias && (
+            <>
+              <button className="visor-nav prev" onClick={() => mover(-1)} aria-label="Anterior"><ChevronLeft size={22} /></button>
+              <button className="visor-nav sig" onClick={() => mover(1)} aria-label="Siguiente"><ChevronRight size={22} /></button>
+            </>
+          )}
+        </div>
         <figcaption>
           {pie}
           {varias && <span className="visor-cuenta dato"> {vista.i + 1} / {vista.lista.length}</span>}
@@ -809,7 +811,6 @@ export default function Pagina({
 
       <footer>
         <span>Harrison · Ford Fiesta Kinetic Design 2012</span>
-        <span>Venta particular. Sin relación con Ford Motor Company.</span>
       </footer>
 
       {vista && <Visor vista={vista} cerrar={() => setVista(null)} mover={mover} />}
@@ -912,7 +913,7 @@ function Globo({
         />
       ))}
       {fijo && (
-        <button className="visor-cerrar" style={{ top: -14, right: -14, width: 30, height: 30, background: '#16181a' }} onClick={cerrar} aria-label="Cerrar">
+        <button className="globo-cerrar" onClick={cerrar} aria-label="Cerrar detalle">
           <X size={15} />
         </button>
       )}
