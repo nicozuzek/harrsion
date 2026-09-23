@@ -714,16 +714,25 @@ export default function Pagina({
               {marcasEstimadas.map((m) => (
                 <g
                   key={m.id}
-                  className={`estimado${activo === m.id ? ' activo' : ''}`}
+                  className={`estimado${activo === m.id ? ' activo' : ''}${fijo && activo === m.id ? ' seleccionado' : ''}`}
                   tabIndex={0}
                   role="button"
+                  aria-pressed={fijo && activo === m.id}
                   aria-label={`${m.entradas.map((e) => `${fecha(e.fecha)}, ${e.servicio!.workshop}`).join('; ')}. Sin kilometraje anotado, estimado ${km(Math.round(m.entradas[0].km))} kilómetros.`}
                   onMouseEnter={() => !fijo && setActivo(m.id)}
                   onMouseLeave={() => !fijo && setActivo(null)}
                   onFocus={() => setActivo(m.id)}
                   onClick={() => { setActivo(m.id); setFijo(true); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActivo(m.id);
+                      setFijo(true);
+                    }
+                  }}
                 >
                   <line className="estimado-tallo" x1={m.cx} y1={base} x2={m.cx} y2={m.cy} />
+                  <circle className="seleccion" cx={m.cx} cy={m.cy} r="13" />
                   <circle className="estimado-punto" cx={m.cx} cy={m.cy} r={m.entradas.length > 1 ? 6 : 4.5} />
                   {m.entradas.length > 1 && <circle className="estimado-anillo" cx={m.cx} cy={m.cy} r="9.5" />}
                   <rect x={m.cx - m.r} y={m.cy - 10} width={m.r * 2} height={base - m.cy + 18} fill="transparent" />
@@ -739,9 +748,10 @@ export default function Pagina({
               {marcadores.map((m) => (
                 <g
                   key={m.id}
-                  className={`punto${m.odometro ? ' punto-odometro' : ''}${compra && !soloPropio && m.cx < compra.cx ? ' previo' : ''}${activo === m.id ? ' activo' : ''}`}
+                  className={`punto${m.odometro ? ' punto-odometro' : ''}${compra && !soloPropio && m.cx < compra.cx ? ' previo' : ''}${activo === m.id ? ' activo' : ''}${fijo && activo === m.id ? ' seleccionado' : ''}`}
                   tabIndex={0}
                   role="button"
+                  aria-pressed={fijo && activo === m.id}
                   aria-label={m.entradas
                     .map((e) =>
                       e.servicio
@@ -753,8 +763,16 @@ export default function Pagina({
                   onMouseLeave={() => !fijo && setActivo(null)}
                   onFocus={() => setActivo(m.id)}
                   onClick={() => { setActivo(m.id); setFijo(true); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActivo(m.id);
+                      setFijo(true);
+                    }
+                  }}
                 >
                   <circle className="halo" cx={m.cx} cy={m.cy} r={m.r} />
+                  <circle className="seleccion" cx={m.cx} cy={m.cy} r="14" />
                   <circle className="nucleo" cx={m.cx} cy={m.cy} r="6" />
                   {m.entradas.length > 1 && <circle className="anillo" cx={m.cx} cy={m.cy} r="10" />}
                 </g>
@@ -790,7 +808,7 @@ export default function Pagina({
               ) : (
                 <div className="historial-ayuda">
                   <strong>Detalle de cada service</strong>
-                  <p>Pasá el cursor o tocá un punto del gráfico para ver la visita y su comprobante.</p>
+                  <p>Pasá el cursor para ver cada visita. Hacé clic en un punto para seleccionarla y abrir todas sus imágenes.</p>
                 </div>
               )}
             </aside>
@@ -913,7 +931,7 @@ function FilaGlobo({
   entrada: EntradaGlobo;
   vehiculo: Vehiculo;
   fijo: boolean;
-  ampliar: (s: Servicio) => void;
+  ampliar: (s: Servicio, i?: number) => void;
   compacta: boolean;
 }) {
   const { servicio, km: kms, fecha: f, estimado } = entrada;
@@ -929,7 +947,36 @@ function FilaGlobo({
 
   return (
     <div className={`globo-fila${compacta ? ' compacta' : ''}`}>
-      {escaneo && <Escaneado escaneo={escaneo} alt="" />}
+      {escaneo && (
+        <div className="globo-media">
+          {fijo ? (
+            <button className="globo-principal" type="button" onClick={() => ampliar(servicio!, 0)} aria-label={`Abrir imagen 1 de ${scans.length}`}>
+              <Escaneado escaneo={escaneo} alt="" />
+            </button>
+          ) : (
+            <Escaneado escaneo={escaneo} alt="" />
+          )}
+          {scans.length > 1 && (
+            <div className="globo-miniaturas" aria-label={`${scans.length} imágenes disponibles`}>
+              {scans.slice(1).map((scan, i) => fijo ? (
+                <button
+                  key={scan.src}
+                  type="button"
+                  onClick={() => ampliar(servicio!, i + 1)}
+                  aria-label={`Abrir imagen ${i + 2} de ${scans.length}${scan.label ? `: ${scan.label}` : ''}`}
+                >
+                  <Image src={scan.src} alt="" width={scan.w} height={scan.h} sizes="48px" />
+                </button>
+              ) : (
+                <span key={scan.src}>
+                  <Image src={scan.src} alt="" width={scan.w} height={scan.h} sizes="48px" />
+                </span>
+              ))}
+              <span className="globo-cantidad dato">{scans.length} imágenes</span>
+            </div>
+          )}
+        </div>
+      )}
       <div className="globo-texto">
         <div className="globo-fecha dato">{fecha(f)}</div>
         <div className="globo-taller">{servicio ? servicio.workshop : 'Odómetro hoy'}</div>
@@ -949,7 +996,7 @@ function FilaGlobo({
         {escaneo && fijo && (
           <button className="globo-ampliar" onClick={() => ampliar(servicio!)}>{abrirTexto}</button>
         )}
-        {escaneo && !fijo && <div className="globo-sin">Tocá el punto para ampliar</div>}
+        {escaneo && !fijo && <div className="globo-accion">Hacé clic en el punto para seleccionar</div>}
         {servicio && !escaneo && <div className="globo-sin">Sin respaldo escaneado</div>}
       </div>
     </div>
@@ -967,13 +1014,17 @@ function Globo({
   vehiculo: Vehiculo;
   fijo: boolean;
   cerrar: () => void;
-  ampliar: (s: Servicio) => void;
+  ampliar: (s: Servicio, i?: number) => void;
 }) {
   const { entradas } = marcador;
   const varias = entradas.length > 1;
 
   return (
     <div className={`globo${fijo ? ' fijo' : ''}${varias ? ' multiple' : ''}`} role="status">
+      <div className="globo-estado">
+        <span className="globo-estado-punto" />
+        {fijo ? 'Seleccionado' : 'Vista previa'}
+      </div>
       {varias && <div className="globo-encabezado">{entradas.length} visitas casi el mismo día</div>}
       {entradas.map((e, i) => (
         <FilaGlobo
