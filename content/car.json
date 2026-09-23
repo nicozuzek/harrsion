@@ -15,13 +15,6 @@
   },
   "fotos": [
     {
-      "file": "00-frente-entre-los-arboles.jpg",
-      "label": "Frente, entre los árboles",
-      "shot": "frente",
-      "w": 2200,
-      "h": 2933
-    },
-    {
       "file": "01-tres-cuartos-delantero-izquierdo.jpg",
       "label": "Tres cuartos delantero, al atardecer",
       "shot": "tres-cuartos-delantero",
@@ -127,6 +120,21 @@
       "h": 1650
     },
     {
+      "file": "00-frente-entre-los-arboles.jpg",
+      "label": "Frente, entre los árboles",
+      "shot": "frente",
+      "w": 2200,
+      "h": 2933,
+      "portada": true
+    },
+    {
+      "file": "22-espejo-al-atardecer.jpg",
+      "label": "Espejo lateral, al atardecer en el campo",
+      "shot": "espejo",
+      "w": 1650,
+      "h": 2200
+    },
+    {
       "file": "20-estacionado-de-frente.jpg",
       "label": "Estacionado, tres cuartos delantero",
       "shot": "tres-cuartos-delantero",
@@ -137,13 +145,6 @@
       "file": "21-estacionado-de-atras.jpg",
       "label": "Estacionado, tres cuartos trasero",
       "shot": "tres-cuartos-trasero",
-      "w": 1650,
-      "h": 2200
-    },
-    {
-      "file": "22-espejo-al-atardecer.jpg",
-      "label": "Espejo lateral, al atardecer en el campo",
-      "shot": "espejo",
       "w": 1650,
       "h": 2200
     }

@@ -24,7 +24,7 @@ export type Historia = {
   enlace?: { texto: string; url: string };
   fotos: Foto[];
 };
-export type Foto = { file: string; label: string; w: number; h: number; shot?: string; nota?: string; historia?: Historia };
+export type Foto = { file: string; label: string; w: number; h: number; shot?: string; nota?: string; historia?: Historia; portada?: boolean };
 export type Cuadro = { file: string; label: string; w: number; h: number };
 export type Cochera = { file: string; label: string; w: number; h: number };
 export type Equipo = { titulo: string; detalle: string; lista?: string[] };
@@ -362,6 +362,8 @@ export default function Pagina({
   const [fijo, setFijo] = useState(false);
   const [soloPropio, setSoloPropio] = useState(false);
   const [ventana, setVentana] = useState<Ventana | null>(null);
+  // la foto de portada se marca en el contenido; si ninguna lo está, va la primera
+  const portada = fotos.find((f) => f.portada) ?? fotos[0];
   const airbags = equipamiento.find((e) => e.lista);
   const tuercas = mejoras.find((m) => m.historia)?.historia;
   const abrirVentana = (v: Ventana) => {
@@ -571,12 +573,12 @@ export default function Pagina({
 
       <main>
         <section id="portada" className="portada">
-          {fotos[0] && (
+          {portada && (
             <Image
-              src={`/car/fotos/${fotos[0].file}`}
-              alt={`Ford Fiesta 2012. ${fotos[0].label}`}
-              width={fotos[0].w}
-              height={fotos[0].h}
+              src={`/car/fotos/${portada.file}`}
+              alt={`Ford Fiesta 2012. ${portada.label}`}
+              width={portada.w}
+              height={portada.h}
               loading="eager"
               fetchPriority="high"
               sizes="100vw"
