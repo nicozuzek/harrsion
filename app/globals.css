@@ -17,6 +17,8 @@
 * { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
+/* nada puede empujar la página hacia los costados; clip (no hidden) no rompe el sticky */
+html, body { overflow-x: clip; }
 
 body {
   margin: 0;

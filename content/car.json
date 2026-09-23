@@ -120,11 +120,32 @@
       "h": 1650
     },
     {
-      "file": "19-baul-por-dentro.jpg",
+      "file": "19-interior-del-baul.jpg",
       "label": "Baúl por dentro",
       "shot": "baul",
-      "w": 1280,
-      "h": 960
+      "w": 2200,
+      "h": 1650
+    },
+    {
+      "file": "20-estacionado-de-frente.jpg",
+      "label": "Estacionado, tres cuartos delantero",
+      "shot": "tres-cuartos-delantero",
+      "w": 1650,
+      "h": 2200
+    },
+    {
+      "file": "21-estacionado-de-atras.jpg",
+      "label": "Estacionado, tres cuartos trasero",
+      "shot": "tres-cuartos-trasero",
+      "w": 1650,
+      "h": 2200
+    },
+    {
+      "file": "22-espejo-al-atardecer.jpg",
+      "label": "Espejo lateral, al atardecer en el campo",
+      "shot": "espejo",
+      "w": 1650,
+      "h": 2200
     }
   ],
   "detalles": [
