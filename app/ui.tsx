@@ -574,7 +574,7 @@ export default function Pagina({
           {fotos[0] && (
             <Image
               src={`/car/fotos/${fotos[0].file}`}
-              alt="Ford Fiesta 2012 de perfil, tres cuartos delantero"
+              alt={`Ford Fiesta 2012. ${fotos[0].label}`}
               width={fotos[0].w}
               height={fotos[0].h}
               loading="eager"
