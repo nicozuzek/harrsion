@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import { Check, ChevronLeft, ChevronRight, Info, Mail, RotateCw, X, ZoomIn, ZoomOut } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Info, Mail, MapPin, RotateCw, X, ZoomIn, ZoomOut } from 'lucide-react';
 
 export type Resalte = { kind: 'date' | 'km'; x: number; y: number; w: number; h: number };
 export type Escaneo = { src: string; w: number; h: number; highlights: Resalte[]; tipo: 'comprobante' | 'foto'; label?: string };
@@ -41,6 +41,7 @@ export type Vehiculo = {
   compraKm?: number;
   precioUsd: number;
   contacto: string;
+  ubicacion: string;
 };
 
 const km = (n: number) => new Intl.NumberFormat('es-AR').format(n);
@@ -58,18 +59,20 @@ const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana 
   { titulo: 'Control de estabilidad y ESP' },
   { titulo: 'Asistente de arranque en pendiente' },
   { titulo: 'Techo solar eléctrico' },
-  { titulo: 'Luces ambiente en el interior' },
+  { titulo: 'Luces LED interiores de color personalizable (modo fiesta)' },
   { titulo: 'Espejo retrovisor electrocrómico' },
   { titulo: 'Dirección eléctrica' },
   { titulo: 'Espejos exteriores con visor de punto ciego' },
   { titulo: 'Polarizado antivandálico marca Strong', agregado: true, ventana: 'polarizado' },
   { titulo: 'Kit luces xenón', agregado: true },
   { titulo: 'Sensores de estacionamiento traseros', agregado: true },
+  { titulo: 'Alarma volumétrica', agregado: true },
   { titulo: 'Tuercas de acero macizo', agregado: true, ventana: 'tuercas' },
 ];
 const NOTAS: Record<string, string> = {
   'Kit luces xenón': 'Viene desinstalado',
   'Sensores de estacionamiento traseros': 'Agregados en agencia',
+  'Alarma volumétrica': 'Colocada en agencia',
 };
 
 /* Botón "Escribirme": copia el mail al portapapeles y avisa un momento. */
@@ -590,6 +593,7 @@ export default function Pagina({
               <Image className="portada-fiesta" src="/brand/fiesta.png" alt="Fiesta" width={539} height={134} priority />
               <span className="oculto">{vehiculo.nombre}, {vehiculo.modelo} {vehiculo.anio}</span>
             </h1>
+            <p className="ubicacion ubicacion-portada"><MapPin size={18} /> Se puede ver por: <strong>{vehiculo.ubicacion}</strong></p>
             <div className="ficha-tira dato">
               <div className="ficha-modelo"><span>Modelo</span><strong>{vehiculo.modelo}</strong></div>
               <div><span>Año</span><strong>{vehiculo.anio}</strong></div>
@@ -888,6 +892,7 @@ export default function Pagina({
               <span>Precio</span>USD {usd(vehiculo.precioUsd)}
             </div>
             <div>
+              <p className="ubicacion ubicacion-final"><MapPin size={18} /> Se puede ver por: <strong>{vehiculo.ubicacion}</strong></p>
               <Copiar email={vehiculo.contacto} />
             </div>
           </div>

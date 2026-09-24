@@ -122,6 +122,23 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .portada-ford, .portada-fiesta { height: clamp(45px, 7.5vw, 110px); width: auto; filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.45)); }
 .oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
+.ubicacion {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+}
+.ubicacion svg { flex: 0 0 auto; }
+.ubicacion-portada {
+  width: fit-content;
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 100px;
+  background: rgba(10, 12, 14, 0.42);
+  backdrop-filter: blur(8px);
+}
+
 .ficha-tira {
   display: flex;
   flex-wrap: wrap;
@@ -703,6 +720,7 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .precio-monto { font-size: clamp(3.5rem, 11vw, 8rem); font-variation-settings: 'wdth' 120; font-weight: 900; line-height: 0.85; }
 .precio-monto span { font-size: 0.3em; display: block; color: var(--grafito); font-weight: 600; }
 .precio p { max-width: 38ch; color: var(--grafito); margin: 0; }
+.precio .ubicacion-final { color: var(--asfalto); }
 
 .boton {
   display: inline-flex;
