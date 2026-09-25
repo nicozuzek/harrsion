@@ -35,6 +35,7 @@ export type Vehiculo = {
   puertas: number;
   motor: string;
   caja: string;
+  paisOrigen: string;
   odometro: number;
   odometroFecha: string;
   cubiertas: string;
@@ -58,6 +59,7 @@ const ESPECIFICACIONES: { titulo: string; agregado?: boolean; ventana?: Ventana 
   { titulo: '7 airbags', ventana: 'airbags' },
   { titulo: 'Control de estabilidad y ESP' },
   { titulo: 'Asistente de arranque en pendiente' },
+  { titulo: 'Calidad de fabricación para el mercado estadounidense 🇺🇸' },
   { titulo: 'Techo solar eléctrico' },
   { titulo: 'Luces LED interiores de color personalizable (modo fiesta)' },
   { titulo: 'Espejo retrovisor electrocrómico' },
@@ -600,6 +602,7 @@ export default function Pagina({
               <div><span>Odómetro</span><strong>{km(vehiculo.odometro)} <em>km</em></strong></div>
               <div><span>Registros de service</span><strong>{services.length}</strong></div>
               <div><span>Historial</span><strong>Segundo dueño</strong></div>
+              <div><span>País de origen</span><strong>{vehiculo.paisOrigen}</strong></div>
             </div>
           </div>
         </section>
