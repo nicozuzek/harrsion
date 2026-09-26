@@ -474,26 +474,42 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 
 ::view-transition { pointer-events: none; }
 ::view-transition-group(grafico-historial) {
-  animation-duration: 0.62s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: 0.82s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+::view-transition-old(grafico-historial),
+::view-transition-new(grafico-historial) {
+  transform-origin: 74% 52%;
 }
 html[data-historial-transicion='acercar']::view-transition-old(grafico-historial) {
-  animation: historial-sale-acercar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: historial-sale-acercar 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 html[data-historial-transicion='acercar']::view-transition-new(grafico-historial) {
-  animation: historial-entra-acercar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: historial-entra-acercar 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 html[data-historial-transicion='alejar']::view-transition-old(grafico-historial) {
-  animation: historial-sale-alejar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: historial-sale-alejar 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 html[data-historial-transicion='alejar']::view-transition-new(grafico-historial) {
-  animation: historial-entra-alejar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: historial-entra-alejar 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes historial-sale-acercar { to { opacity: 0; transform: scale(1.025); } }
-@keyframes historial-entra-acercar { from { opacity: 0; transform: scale(0.975); } }
-@keyframes historial-sale-alejar { to { opacity: 0; transform: scale(0.975); } }
-@keyframes historial-entra-alejar { from { opacity: 0; transform: scale(1.025); } }
+@keyframes historial-sale-acercar {
+  0% { opacity: 1; transform: scale(1); filter: blur(0); }
+  72%, 100% { opacity: 0; transform: scale(1.09); filter: blur(1.5px); }
+}
+@keyframes historial-entra-acercar {
+  0%, 12% { opacity: 0; transform: scale(0.91); filter: blur(1.5px); }
+  72%, 100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes historial-sale-alejar {
+  0% { opacity: 1; transform: scale(1); filter: blur(0); }
+  72%, 100% { opacity: 0; transform: scale(0.91); filter: blur(1.5px); }
+}
+@keyframes historial-entra-alejar {
+  0%, 12% { opacity: 0; transform: scale(1.09); filter: blur(1.5px); }
+  72%, 100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(grafico-historial),
