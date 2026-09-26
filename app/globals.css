@@ -381,7 +381,13 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 .grafico-caja { min-width: 0; }
 .grafico-lienzo { position: relative; }
 .registros-scroll { overflow-x: auto; }
-.grafico { width: 100%; height: auto; overflow: visible; display: block; }
+.grafico {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  display: block;
+  view-transition-name: grafico-historial;
+}
 
 .eje-linea { stroke: #3a3e40; stroke-width: 1; }
 .eje-texto { fill: #7d8481; font-size: 13px; font-variant-numeric: tabular-nums; }
@@ -464,6 +470,38 @@ h2 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
   .relleno.visible { opacity: 1; }
   .tramo-nota, .corte { opacity: 0; animation: aparecer 0.6s ease 1.5s forwards; }
   .tramo-nota.previo { animation-name: aparecer-previo; }
+}
+
+::view-transition { pointer-events: none; }
+::view-transition-group(grafico-historial) {
+  animation-duration: 0.62s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+html[data-historial-transicion='acercar']::view-transition-old(grafico-historial) {
+  animation: historial-sale-acercar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[data-historial-transicion='acercar']::view-transition-new(grafico-historial) {
+  animation: historial-entra-acercar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[data-historial-transicion='alejar']::view-transition-old(grafico-historial) {
+  animation: historial-sale-alejar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[data-historial-transicion='alejar']::view-transition-new(grafico-historial) {
+  animation: historial-entra-alejar 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes historial-sale-acercar { to { opacity: 0; transform: scale(1.025); } }
+@keyframes historial-entra-acercar { from { opacity: 0; transform: scale(0.975); } }
+@keyframes historial-sale-alejar { to { opacity: 0; transform: scale(0.975); } }
+@keyframes historial-entra-alejar { from { opacity: 0; transform: scale(1.025); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(grafico-historial),
+  ::view-transition-new(grafico-historial),
+  ::view-transition-group(grafico-historial) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
 }
 
 @keyframes aparecer { to { opacity: 0.75; } }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import Image from 'next/image';
 import { Check, ChevronLeft, ChevronRight, Info, Mail, MapPin, RotateCw, X, ZoomIn, ZoomOut } from 'lucide-react';
 
@@ -549,6 +550,25 @@ export default function Pagina({
 
   const cerrarGlobo = useCallback(() => { setActivo(null); setFijo(false); }, []);
 
+  const cambiarVistaHistorial = () => {
+    const actualizar = () => {
+      setSoloPropio((actual) => !actual);
+      setActivo(null);
+      setFijo(false);
+    };
+    const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducirMovimiento || !document.startViewTransition) {
+      actualizar();
+      return;
+    }
+
+    document.documentElement.dataset.historialTransicion = soloPropio ? 'alejar' : 'acercar';
+    const transicion = document.startViewTransition(() => flushSync(actualizar));
+    void transicion.finished.finally(() => {
+      delete document.documentElement.dataset.historialTransicion;
+    });
+  };
+
   useEffect(() => {
     if (!fijo) return;
     const tecla = (e: KeyboardEvent) => { if (e.key === 'Escape') cerrarGlobo(); };
@@ -662,11 +682,7 @@ export default function Pagina({
                 type="button"
                 className="zoom-historial"
                 aria-pressed={soloPropio}
-                onClick={() => {
-                  setSoloPropio((actual) => !actual);
-                  setActivo(null);
-                  setFijo(false);
-                }}
+                onClick={cambiarVistaHistorial}
               >
                 {soloPropio ? <ZoomOut size={17} /> : <ZoomIn size={17} />}
                 {soloPropio ? 'Ver historial completo' : 'Ver dueño actual'}
