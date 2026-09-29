@@ -174,10 +174,10 @@ function Giro({ cuadros }: { cuadros: Cuadro[] }) {
   );
 }
 
-function Escaneado({ escaneo, alt }: { escaneo: Escaneo; alt: string }) {
+function Escaneado({ escaneo, alt, sizes = '(max-width: 860px) 60vw, 700px' }: { escaneo: Escaneo; alt: string; sizes?: string }) {
   return (
     <div className="escaneo">
-      <Image src={escaneo.src} alt={alt} width={escaneo.w} height={escaneo.h} sizes="(max-width: 860px) 60vw, 700px" />
+      <Image src={escaneo.src} alt={alt} width={escaneo.w} height={escaneo.h} sizes={sizes} draggable={false} />
       {escaneo.highlights.map((h, i) => (
         <span
           key={i}
@@ -232,11 +232,161 @@ function Ventana({ titulo, cerrar, children }: { titulo: string; cerrar: () => v
   }, [cerrar]);
 
   return (
-    <div className="visor" role="dialog" aria-modal="true" aria-label={titulo} onClick={cerrar}>
+    <div className="visor visor-ventana" role="dialog" aria-modal="true" aria-label={titulo} onClick={cerrar}>
       <div className="ventana" onClick={(e) => e.stopPropagation()}>
         <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
         <h3>{titulo}</h3>
         {children}
+      </div>
+    </div>
+  );
+}
+
+const ZOOM_MAX = 5;
+type Zoom = { s: number; x: number; y: number };
+
+// escenario del visor: encaja la imagen en el espacio libre y deja acercar
+// con la rueda, doble clic, pellizco o los botones, y arrastrar para moverse
+function Lienzo({ w, h, cerrar, children }: { w: number; h: number; cerrar: () => void; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [caja, setCaja] = useState({ W: 0, H: 0 });
+  const [zoom, setZoom] = useState<Zoom>({ s: 1, x: 0, y: 0 });
+  const [arrastrando, setArrastrando] = useState(false);
+  // los gestos encadenan varios cambios por cuadro: el ref tiene siempre el último
+  const zoomRef = useRef(zoom);
+  const aplicar = useCallback((z: Zoom) => { zoomRef.current = z; setZoom(z); }, []);
+  const punteros = useRef(new Map<number, { x: number; y: number }>());
+  const movido = useRef(false);
+  const enFondo = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current!;
+    const ro = new ResizeObserver(([e]) => setCaja({ W: e.contentRect.width, H: e.contentRect.height }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const escala = caja.W && caja.H ? Math.min(caja.W / w, caja.H / h) : 0;
+  const ancho = w * escala;
+  const alto = h * escala;
+
+  const limitar = useCallback(
+    ({ s, x, y }: Zoom): Zoom => {
+      const mx = Math.max(0, (ancho * s - caja.W) / 2);
+      const my = Math.max(0, (alto * s - caja.H) / 2);
+      return { s, x: Math.min(mx, Math.max(-mx, x)), y: Math.min(my, Math.max(-my, y)) };
+    },
+    [ancho, alto, caja],
+  );
+
+  // acerca o aleja dejando quieto el punto (cx, cy), medido desde el centro del escenario
+  const acercar = useCallback(
+    (factor: number, cx = 0, cy = 0) => {
+      const z = zoomRef.current;
+      const s = Math.min(ZOOM_MAX, Math.max(1, z.s * factor));
+      const r = s / z.s;
+      aplicar(limitar({ s, x: cx - (cx - z.x) * r, y: cy - (cy - z.y) * r }));
+    },
+    [limitar, aplicar],
+  );
+
+  const desdeCentro = (clientX: number, clientY: number) => {
+    const r = ref.current!.getBoundingClientRect();
+    return [clientX - r.left - r.width / 2, clientY - r.top - r.height / 2] as const;
+  };
+
+  // la rueda necesita un listener no pasivo para que no se mueva la página
+  useEffect(() => {
+    const el = ref.current!;
+    const rueda = (e: WheelEvent) => {
+      e.preventDefault();
+      const [cx, cy] = desdeCentro(e.clientX, e.clientY);
+      acercar(Math.exp(-e.deltaY * 0.0022), cx, cy);
+    };
+    el.addEventListener('wheel', rueda, { passive: false });
+    return () => el.removeEventListener('wheel', rueda);
+  }, [acercar]);
+
+  const bajar = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    enFondo.current = e.target === ref.current;
+    ref.current!.setPointerCapture(e.pointerId);
+    punteros.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    movido.current = false;
+    setArrastrando(true);
+  };
+
+  const mover = (e: React.PointerEvent) => {
+    const p = punteros.current;
+    const previo = p.get(e.pointerId);
+    if (!previo) return;
+    const ahora = { x: e.clientX, y: e.clientY };
+    if (p.size === 2) {
+      const [a, b] = [...p.values()];
+      const otro = a === previo ? b : a;
+      const antes = Math.hypot(previo.x - otro.x, previo.y - otro.y);
+      const despues = Math.hypot(ahora.x - otro.x, ahora.y - otro.y);
+      const [cx, cy] = desdeCentro((ahora.x + otro.x) / 2, (ahora.y + otro.y) / 2);
+      if (antes > 0) acercar(despues / antes, cx, cy);
+      movido.current = true;
+    } else if (zoomRef.current.s > 1) {
+      const dx = ahora.x - previo.x;
+      const dy = ahora.y - previo.y;
+      if (Math.abs(dx) + Math.abs(dy) > 2) movido.current = true;
+      const z = zoomRef.current;
+      aplicar(limitar({ s: z.s, x: z.x + dx, y: z.y + dy }));
+    }
+    p.set(e.pointerId, ahora);
+  };
+
+  const soltar = (e: React.PointerEvent) => {
+    punteros.current.delete(e.pointerId);
+    if (!punteros.current.size) setArrastrando(false);
+  };
+
+  const dobleClic = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    const [cx, cy] = desdeCentro(e.clientX, e.clientY);
+    if (zoomRef.current.s > 1) aplicar({ s: 1, x: 0, y: 0 });
+    else acercar(2.5, cx, cy);
+  };
+
+  // un clic en el fondo cierra, salvo que se haya arrastrado o sea sobre la imagen
+  const clic = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (movido.current) { movido.current = false; return; }
+    if (enFondo.current && e.target === ref.current) cerrar();
+  };
+
+  const acercado = zoom.s > 1;
+
+  return (
+    <div
+      ref={ref}
+      className={`visor-lienzo${acercado ? ' acercado' : ''}`}
+      onPointerDown={bajar}
+      onPointerMove={mover}
+      onPointerUp={soltar}
+      onPointerCancel={soltar}
+      onDoubleClick={dobleClic}
+      onClick={clic}
+    >
+      {escala > 0 && (
+        <div
+          className="visor-media"
+          style={{
+            width: ancho,
+            height: alto,
+            transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.s})`,
+            transition: arrastrando ? 'none' : undefined,
+          }}
+        >
+          {children}
+        </div>
+      )}
+      <div className="visor-zoom">
+        <button onClick={() => acercar(1 / 1.6)} disabled={!acercado} aria-label="Alejar"><ZoomOut size={18} /></button>
+        <button onClick={() => acercar(1.6)} disabled={zoom.s >= ZOOM_MAX} aria-label="Acercar"><ZoomIn size={18} /></button>
       </div>
     </div>
   );
@@ -266,47 +416,42 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
       ? [vista.pie, (actual as Escaneo).label].filter(Boolean).join(' · ')
       : (actual as Foto).label;
   const varias = vista.lista.length > 1;
-  // el marco toma la proporción de la foto más alta del grupo: así el texto de abajo no salta al pasar
-  const proporcion = Math.min(...vista.lista.map((x) => x.w / x.h));
+  const fuente = (item: Foto | Escaneo) => (vista.tipo === 'escaneo' ? (item as Escaneo).src : `/car/${vista.carpeta}/${(item as Foto).file}`);
 
   return (
     <div className={`visor${vista.tipo === 'historia' ? ' visor-con-historia' : ''}`} role="dialog" aria-modal="true" aria-label={pie} onClick={cerrar}>
-      <figure className="visor-marco" onClick={(e) => e.stopPropagation()}>
-        <div className="visor-media" style={{ aspectRatio: String(proporcion) }}>
-          <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
+      <button className="visor-cerrar" onClick={cerrar} aria-label="Cerrar"><X size={20} /></button>
+      <div className="visor-escenario">
+        {/* cada imagen nueva arranca entera */}
+        <Lienzo key={fuente(actual)} w={actual.w} h={actual.h} cerrar={cerrar}>
           {vista.tipo !== 'escaneo' ? (
-            <Image
-              src={`/car/${vista.carpeta}/${(actual as Foto).file}`}
-              alt={(actual as Foto).label}
-              width={actual.w}
-              height={actual.h}
-              sizes="100vw"
-            />
+            <Image src={fuente(actual)} alt={(actual as Foto).label} width={actual.w} height={actual.h} sizes="100vw" draggable={false} />
           ) : (
-            <Escaneado escaneo={actual as Escaneo} alt={pie} />
+            <Escaneado escaneo={actual as Escaneo} alt={pie} sizes="100vw" />
           )}
-          {/* el resto del carrusel se descarga apenas se abre, así pasar de foto no espera */}
-          {varias && (
-            <div hidden>
-              {vista.lista.map((item, n) => {
-                if (n === vista.i) return null;
-                const src = vista.tipo === 'escaneo' ? (item as Escaneo).src : `/car/${vista.carpeta}/${(item as Foto).file}`;
-                const sizes = vista.tipo === 'escaneo' ? '(max-width: 860px) 60vw, 700px' : '100vw';
-                return <Image key={src} src={src} alt="" width={item.w} height={item.h} sizes={sizes} loading="eager" />;
-              })}
-            </div>
-          )}
-          {varias && (
-            <>
-              <button className="visor-nav prev" onClick={() => mover(-1)} aria-label="Anterior"><ChevronLeft size={22} /></button>
-              <button className="visor-nav sig" onClick={() => mover(1)} aria-label="Siguiente"><ChevronRight size={22} /></button>
-            </>
-          )}
-        </div>
-        <figcaption>
+        </Lienzo>
+        {varias && (
+          <>
+            <button className="visor-nav prev" onClick={(e) => { e.stopPropagation(); mover(-1); }} aria-label="Anterior"><ChevronLeft size={22} /></button>
+            <button className="visor-nav sig" onClick={(e) => { e.stopPropagation(); mover(1); }} aria-label="Siguiente"><ChevronRight size={22} /></button>
+          </>
+        )}
+        {/* el resto del carrusel se descarga apenas se abre, así pasar de foto no espera */}
+        {varias && (
+          <div hidden>
+            {vista.lista.map((item, n) =>
+              n === vista.i ? null : (
+                <Image key={fuente(item)} src={fuente(item)} alt="" width={item.w} height={item.h} sizes="100vw" loading="eager" />
+              ),
+            )}
+          </div>
+        )}
+      </div>
+      <div className="visor-pie" onClick={(e) => e.stopPropagation()}>
+        <p className="visor-leyenda">
           {pie}
           {varias && <span className="visor-cuenta dato"> {vista.i + 1} / {vista.lista.length}</span>}
-        </figcaption>
+        </p>
         {vista.tipo === 'historia' && (
           <div className="visor-historia">
             <h3>{vista.historia.titulo}</h3>
@@ -318,7 +463,7 @@ function Visor({ vista, cerrar, mover }: { vista: Vista; cerrar: () => void; mov
             )}
           </div>
         )}
-      </figure>
+      </div>
     </div>
   );
 }

@@ -756,7 +756,7 @@ html[data-historial-transicion='alejar']::view-transition-new(grafico-historial)
 .cochera-grid button { cursor: pointer; text-align: left; }
 .cochera-grid img { width: 100%; height: clamp(240px, 30vw, 380px); object-fit: cover; }
 
-.visor-cuenta { color: #8e9693; margin-left: 0.6rem; }
+.visor-cuenta { color: #8e9693; margin-left: 0.6rem; white-space: nowrap; }
 .visor-historia {
   max-width: 58ch;
   margin: 1rem auto 0;
@@ -810,24 +810,32 @@ footer {
   inset: 0;
   z-index: 60;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2.5rem 1rem;
+  flex-direction: column;
+  padding: 1rem 1rem 0;
   background: rgba(12, 14, 15, 0.93);
-  --alto-visor: 82vh;
+  --alto-escenario: auto;
 }
-.visor-marco { position: relative; max-width: 1100px; width: 100%; text-align: center; }
-.visor-media {
-  position: relative;
+/* el escenario ocupa todo lo que deja el pie, así la leyenda queda siempre en el mismo lugar */
+.visor-escenario { position: relative; flex: 1 1 var(--alto-escenario); min-height: 0; }
+.visor-lienzo {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-height: var(--alto-visor);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  cursor: zoom-in;
 }
-.visor img { width: auto; height: auto; max-width: 100%; max-height: var(--alto-visor); object-fit: contain; }
-.visor figcaption { color: #cdd2cf; font-size: 0.8rem; padding-top: 0.8rem; text-align: center; }
-.visor-cerrar, .visor-nav {
+.visor-lienzo.acercado { cursor: grab; }
+.visor-lienzo.acercado:active { cursor: grabbing; }
+.visor-media { position: relative; flex: 0 0 auto; transform-origin: center; transition: transform 0.18s ease-out; }
+.visor-media > img, .visor .escaneo, .visor .escaneo img { display: block; width: 100%; height: 100%; }
+.visor-media img { -webkit-user-drag: none; }
+.visor-pie { flex: 0 0 auto; padding: 0.8rem 0 1rem; }
+.visor-leyenda { color: #cdd2cf; font-size: 0.8rem; margin: 0; text-align: center; }
+.visor-cerrar, .visor-nav, .visor-zoom button {
   position: absolute;
   cursor: pointer;
   color: #fff;
@@ -839,18 +847,18 @@ footer {
   align-items: center;
   justify-content: center;
 }
-.visor-cerrar { top: 0.75rem; right: 0.75rem; z-index: 2; }
-.visor-nav.prev { left: -1rem; top: 50%; transform: translateY(-50%); }
-.visor-nav.sig { right: -1rem; top: 50%; transform: translateY(-50%); }
-.visor-nav:hover, .visor-cerrar:hover { background: rgba(0, 0, 0, 0.8); }
-.visor .escaneo { display: inline-block; width: auto; max-width: 100%; vertical-align: top; }
-.visor .escaneo img { width: auto; height: auto; max-width: 100%; max-height: var(--alto-visor); }
-.visor-con-historia {
-  align-items: flex-start;
-  overflow-y: auto;
-  padding-block: 1rem;
-  --alto-visor: 58vh;
-}
+.visor-cerrar { top: 0.75rem; right: 0.75rem; z-index: 3; }
+.visor > .visor-cerrar { position: fixed; top: 1rem; right: 1rem; }
+.visor-nav { z-index: 2; top: 50%; transform: translateY(-50%); }
+.visor-nav.prev { left: 0.5rem; }
+.visor-nav.sig { right: 0.5rem; }
+.visor-zoom { position: absolute; right: 0.5rem; bottom: 0.5rem; z-index: 2; display: flex; gap: 0.5rem; }
+.visor-zoom button { position: static; }
+.visor-zoom button:disabled { opacity: 0.35; cursor: default; }
+.visor-nav:hover, .visor-cerrar:hover, .visor-zoom button:not(:disabled):hover { background: rgba(0, 0, 0, 0.8); }
+.visor-ventana { align-items: center; justify-content: center; padding: 2.5rem 1rem; }
+.visor-con-historia { overflow-y: auto; --alto-escenario: 62vh; }
+.visor-con-historia .visor-escenario { flex-shrink: 0; }
 
 .vacio {
   border: 1px dashed var(--linea);
@@ -871,13 +879,13 @@ footer {
   .portada-marcas { flex-wrap: wrap; }
   .ventana { padding: 1.6rem 1.2rem; }
   .visor-historia { max-width: none; }
+  /* dos renglones reservados: una leyenda larga no achica la imagen */
+  .visor-leyenda { min-height: 2.9em; line-height: 1.45; }
   .registros > summary { width: 100%; justify-content: space-between; }
   .historial-cabecera { align-items: flex-start; flex-direction: column; margin-bottom: 2rem; }
   .historial-interactivo { grid-template-columns: 1fr; gap: 1.25rem; }
   .historial-detalle { position: static; min-height: 0; }
   .historial-ayuda { min-height: 150px; }
   .globo { max-height: none; }
-  .visor-nav.prev { left: 0; }
-  .visor-nav.sig { right: 0; }
   .registros .col-obs { display: none; }
 }
